@@ -2,7 +2,7 @@
 
 Personal Site for Vvan1shmz
 
-Live URL (after deploy): https://vvan1shmz.github.io
+Live URL : https://vvan1shmz.github.io
 
 ## Local preview
 
@@ -10,9 +10,3 @@ Live URL (after deploy): https://vvan1shmz.github.io
 npm install
 npm run dev
 ```
-
-## Edit content
-
-- Name and social links: [`src/data/site.ts`](src/data/site.ts)
-- About page: [`src/pages/index.astro`](src/pages/index.astro)
-- New posts: add a `.md` file in `src/content/blog/`
