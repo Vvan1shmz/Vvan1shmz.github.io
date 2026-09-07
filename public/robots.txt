@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vvan1shmz.github.io/sitemap-index.xml

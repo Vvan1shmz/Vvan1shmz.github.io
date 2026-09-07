@@ -1,0 +1,33 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+function formatDate(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${m}-${d}-${y}`;
+}
+---
+
+<Layout title={`${post.data.title} · vvan1shmz`} description={post.data.description}>
+  <a class="back" href="/blog">Blog</a>
+  <article class="article">
+    <h1 class="article-title">{post.data.title}</h1>
+    <p class="article-meta">
+      <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+    </p>
+    <Content />
+  </article>
+</Layout>
