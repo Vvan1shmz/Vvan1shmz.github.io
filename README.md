@@ -1,6 +1,6 @@
 # vvan1shmz
 
-Personal site: About + Blog. Built with [Astro](https://astro.build) as a static site so anyone can open it.
+Personal Site for Vvan1shmz
 
 Live URL (after deploy): https://vvan1shmz.github.io
 
