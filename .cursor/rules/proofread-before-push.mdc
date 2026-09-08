@@ -1,0 +1,20 @@
+---
+description: Proofread site copy for spelling and grammar before every push
+alwaysApply: true
+---
+
+# Proofread before push
+
+Before every `git push` of this site, check all user-facing English in the change (About, posts, category labels, nav, meta descriptions). Fix spelling and grammar. Do not wait for the user to notice.
+
+Keep the site voice: mostly lowercase, short sentences, no marketing phrasing. Fix errors; do not rewrite their wording unless it is wrong.
+
+```text
+❌ Constistency matters more than intensity
+✅ Consistency matters more than intensity
+
+❌ reasearch
+✅ research
+```
+
+After copy fixes, run `npm run build` so `docs/` matches, then commit source + `docs/` and push. Do not commit `.cursor/skills/`.

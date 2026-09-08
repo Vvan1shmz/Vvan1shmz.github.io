@@ -1,5 +1,6 @@
 [
   { "id": "notes", "label": "notes" },
   { "id": "reading", "label": "reading" },
-  { "id": "making", "label": "making" }
+  { "id": "making", "label": "making" },
+  { "id": "research", "label": "research" }
 ]

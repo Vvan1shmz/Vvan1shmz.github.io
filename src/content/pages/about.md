@@ -6,7 +6,7 @@ beliefs:
   - Humanity defines meaning itself
   - All people are equal
   - Amor Fati
-  - Constistency matters more than intensity
+  - Consistency matters more than intensity
   - tools should stay out of the way
 likes: study alone, serif type, open source, walking, making hard things simple, notebooks, the command line, well-written blogs, Led Zeppelin
 dislikes:
