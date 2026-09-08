@@ -1,40 +1,40 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { getEntry, render } from "astro:content";
 import { site } from "../data/site";
 
+const about = await getEntry("pages", "about");
+if (!about) {
+  throw new Error("Missing src/content/pages/about.md");
+}
+
+const { Content } = await render(about);
 const mail = site.email ? `mailto:${site.email}` : site.social.github;
 ---
 
 <Layout>
   <div class="prose">
-    <h1 class="lede">hi! i'm {site.shortName}</h1>
-    <p>my life goal is to write things down until they become clear.</p>
-    <p>
-      this is my personal site. about is a short, honest introduction. <a href="/blog">blog</a> is for longer notes. the page is meant to stay quiet: more whitespace, less decoration, easier to read.
-    </p>
+    <h1 class="lede">{about.data.lede}</h1>
+    <p>{about.data.goal}</p>
+    <Content />
   </div>
 
   <section class="section">
     <h2>here are some things i believe in:</h2>
     <ul class="beliefs">
-      <li>Empty your mind</li>
-      <li>Humanity defines meaning itself</li>
-      <li>All people are equal</li>
-      <li>Amor Fati</li>
-      <li>Constistency matters more than intensity</li>
-      <li>tools should stay out of the way</li>
+      {about.data.beliefs.map((item) => <li>{item}</li>)}
     </ul>
   </section>
 
   <section class="section">
     <h2>here are some things i like:</h2>
-    <p class="likes">study alone, serif type, open source, walking, making hard things simple, notebooks, the command line, well-written blogs, Led Zeppelin</p>
+    <p class="likes">{about.data.likes}</p>
   </section>
 
   <section class="section">
     <h2>things i don't like:</h2>
     <ul class="list">
-      <li>writing to be seen</li>
+      {about.data.dislikes.map((item) => <li>{item}</li>)}
     </ul>
   </section>
 

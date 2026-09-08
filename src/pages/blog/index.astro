@@ -1,32 +1,29 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getCollection } from "astro:content";
+import CategoryNav from "../../components/CategoryNav.astro";
+import PostList from "../../components/PostList.astro";
+import { getPublishedPosts, groupedPosts, usedCategories } from "../../lib/blog";
 
-const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
-
-function formatDate(date: Date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${m}-${d}-${y}`;
-}
+const posts = await getPublishedPosts();
+const groups = groupedPosts(posts);
+const used = usedCategories(posts);
 ---
 
 <Layout title="Blog · vvan1shmz" description="Posts from vvan1shmz.">
   {
     posts.length ? (
-      <ul class="blog-list">
-        {posts.map((post) => (
-          <li class="blog-item">
-            <time class="blog-date" datetime={post.data.date.toISOString()}>
-              {formatDate(post.data.date)}
-            </time>
-            <a href={`/blog/${post.id}`}>{post.data.title}</a>
-          </li>
+      <>
+        <h1 class="page-kicker">blog</h1>
+        <CategoryNav current="all" used={used} />
+        {groups.map((group) => (
+          <section class="blog-group" aria-labelledby={`cat-${group.id}`}>
+            <h2 class="blog-group-title" id={`cat-${group.id}`}>
+              <a href={`/blog/category/${group.id}`}>{group.label}</a>
+            </h2>
+            <PostList posts={group.posts} />
+          </section>
         ))}
-      </ul>
+      </>
     ) : (
       <p class="empty">nothing here yet.</p>
     )

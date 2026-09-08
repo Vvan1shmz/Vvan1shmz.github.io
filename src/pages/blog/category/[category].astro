@@ -1,0 +1,52 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import CategoryNav from "../../../components/CategoryNav.astro";
+import PostList from "../../../components/PostList.astro";
+import { categories, type CategoryId } from "../../../data/categories";
+import {
+  getPublishedPosts,
+  postsInCategory,
+  usedCategories,
+} from "../../../lib/blog";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  const used = new Set(posts.map((post) => post.data.category));
+  return categories
+    .filter((category) => used.has(category.id))
+    .map((category) => ({
+      params: { category: category.id },
+      props: { categoryId: category.id },
+    }));
+}
+
+interface Props {
+  categoryId: CategoryId;
+}
+
+const { categoryId } = Astro.props;
+const category = categories.find((item) => item.id === categoryId);
+if (!category) {
+  throw new Error(`Unknown category: ${categoryId}`);
+}
+
+const posts = await getPublishedPosts();
+const filtered = postsInCategory(posts, categoryId);
+const used = usedCategories(posts);
+---
+
+<Layout
+  title={`${category.label} · Blog · vvan1shmz`}
+  description={`Posts in ${category.label}.`}
+>
+  <a class="back" href="/blog">Blog</a>
+  <h1 class="page-kicker">{category.label}</h1>
+  <CategoryNav current={categoryId} used={used} />
+  {
+    filtered.length ? (
+      <PostList posts={filtered} />
+    ) : (
+      <p class="empty">nothing here yet.</p>
+    )
+  }
+</Layout>

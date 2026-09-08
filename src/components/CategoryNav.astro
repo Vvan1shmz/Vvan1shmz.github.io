@@ -1,0 +1,28 @@
+---
+import type { CategoryId } from "../data/categories";
+
+interface Props {
+  current?: "all" | CategoryId;
+  used: { id: string; label: string }[];
+}
+
+const { current = "all", used } = Astro.props;
+---
+
+{
+  used.length > 0 && (
+    <nav class="category-nav" aria-label="categories">
+      <a href="/blog" aria-current={current === "all" ? "page" : undefined}>
+        all
+      </a>
+      {used.map((category) => (
+        <a
+          href={`/blog/category/${category.id}`}
+          aria-current={current === category.id ? "page" : undefined}
+        >
+          {category.label}
+        </a>
+      ))}
+    </nav>
+  )
+}
