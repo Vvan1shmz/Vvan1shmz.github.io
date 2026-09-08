@@ -2,12 +2,24 @@
 
 <script>
   const canvas = document.getElementById("constellation") as HTMLCanvasElement | null;
+  const lamp = document.getElementById("pointer-light");
   if (canvas) {
     const ctx = canvas.getContext("2d");
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     if (ctx) {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const points: { x: number; y: number; r: number; hue: number }[] = [];
+      const points: {
+        ox: number;
+        oy: number;
+        x: number;
+        y: number;
+        vx: number;
+        vy: number;
+        r: number;
+        hue: number;
+      }[] = [];
+      const mouse = { x: 0, y: 0, on: false };
       let raf = 0;
 
       function resize() {
@@ -22,27 +34,41 @@
 
       function seed() {
         points.length = 0;
-        const count = Math.round((window.innerWidth * window.innerHeight) / 42000);
-        for (let i = 0; i < Math.max(14, count); i++) {
+        const count = Math.round((window.innerWidth * window.innerHeight) / 28000);
+        for (let i = 0; i < Math.max(18, count); i++) {
+          const x = Math.random() * window.innerWidth;
+          const y = Math.random() * window.innerHeight;
           points.push({
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            r: 0.5 + Math.random() * 1.05,
-            hue: [32, 28, 38, 210][i % 4],
+            ox: x,
+            oy: y,
+            x,
+            y,
+            vx: 0,
+            vy: 0,
+            r: 0.65 + Math.random() * 1.25,
+            hue: [0, 38, 195, 250][i % 4],
           });
         }
       }
 
+      function nearCursor(px: number, py: number) {
+        if (!mouse.on) return 0;
+        const dist = Math.hypot(mouse.x - px, mouse.y - py);
+        return dist < 240 ? 1 - dist / 240 : 0;
+      }
+
       function draw(t: number) {
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        ctx.lineWidth = 0.4;
+        ctx.lineWidth = 0.55;
         for (let i = 0; i < points.length; i++) {
           for (let j = i + 1; j < points.length; j++) {
             const dx = points[i].x - points[j].x;
             const dy = points[i].y - points[j].y;
             const dist = Math.hypot(dx, dy);
-            if (dist < 120) {
-              ctx.strokeStyle = `hsla(${points[i].hue}, 22%, 72%, ${0.05 * (1 - dist / 120)})`;
+            if (dist < 150) {
+              const heat = Math.max(nearCursor(points[i].x, points[i].y), nearCursor(points[j].x, points[j].y));
+              const alpha = (0.07 + heat * 0.16) * (1 - dist / 150);
+              ctx.strokeStyle = `hsla(${points[i].hue}, 42%, 70%, ${alpha})`;
               ctx.beginPath();
               ctx.moveTo(points[i].x, points[i].y);
               ctx.lineTo(points[j].x, points[j].y);
@@ -51,33 +77,73 @@
           }
         }
         for (const p of points) {
-          const pulse = reduceMotion ? 1 : 0.82 + Math.sin(t / 1400 + p.x) * 0.18;
-          ctx.fillStyle = `hsla(${p.hue}, 18%, 86%, ${0.16 * pulse})`;
+          const pulse = reduceMotion ? 1 : 0.75 + Math.sin(t / 1100 + p.x) * 0.25;
+          const heat = nearCursor(p.x, p.y);
+          ctx.fillStyle = `hsla(${p.hue}, 28%, 84%, ${(0.22 + heat * 0.45) * pulse})`;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, p.r + heat * 0.8, 0, Math.PI * 2);
           ctx.fill();
         }
       }
 
-      function loop(now: number) {
+      function step(now: number) {
+        if (!reduceMotion) {
+          for (const p of points) {
+            let ax = (p.ox - p.x) * 0.018;
+            let ay = (p.oy - p.y) * 0.018;
+            if (mouse.on) {
+              const dx = mouse.x - p.x;
+              const dy = mouse.y - p.y;
+              const dist = Math.hypot(dx, dy) || 1;
+              if (dist < 230) {
+                const pull = (1 - dist / 230) * 0.045;
+                ax += dx * pull;
+                ay += dy * pull;
+              }
+            }
+            p.vx = (p.vx + ax) * 0.84;
+            p.vy = (p.vy + ay) * 0.84;
+            p.x += p.vx;
+            p.y += p.vy;
+          }
+        }
         draw(now);
-        raf = requestAnimationFrame(loop);
+        raf = requestAnimationFrame(step);
+      }
+
+      function onMove(event: PointerEvent) {
+        mouse.x = event.clientX;
+        mouse.y = event.clientY;
+        mouse.on = true;
+        document.documentElement.style.setProperty("--pointer-x", `${event.clientX}px`);
+        document.documentElement.style.setProperty("--pointer-y", `${event.clientY}px`);
+        lamp?.classList.add("is-on");
+      }
+
+      function onLeave() {
+        mouse.on = false;
+        lamp?.classList.remove("is-on");
       }
 
       window.addEventListener("resize", resize);
       resize();
+
       if (!reduceMotion) {
-        raf = requestAnimationFrame(loop);
+        raf = requestAnimationFrame(step);
+      }
+
+      if (finePointer && !reduceMotion) {
+        window.addEventListener("pointermove", onMove);
+        document.documentElement.addEventListener("mouseleave", onLeave);
       }
 
       document.addEventListener("visibilitychange", () => {
         if (document.hidden) {
           cancelAnimationFrame(raf);
         } else if (!reduceMotion) {
-          raf = requestAnimationFrame(loop);
+          raf = requestAnimationFrame(step);
         }
       });
-
     }
   }
 </script>

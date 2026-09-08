@@ -20,7 +20,7 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#08080a" />
+    <meta name="theme-color" content="#070708" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -39,6 +39,7 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
     <a class="skip-link" href="#content">Skip to content</a>
     <div class="atmosphere" aria-hidden="true"></div>
     <Constellation />
+    <div class="pointer-light" id="pointer-light" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
     <Header />
     <main id="content" class="page">

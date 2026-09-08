@@ -1,14 +1,16 @@
 :root {
-  --bg: #08080a;
-  --bg-raised: #121218;
-  --text: #f2ece3;
-  --muted: #8f887e;
-  --line: rgba(242, 236, 227, 0.1);
-  --accent: #c9a36a;
+  --bg: #070708;
+  --bg-raised: #101014;
+  --text: #ece6dc;
+  --muted: #9a9288;
+  --line: rgba(236, 230, 220, 0.14);
+  --accent: #c84b4b;
   --focus: #e8d7b0;
   --max: 38.5rem;
   --header: 4.15rem;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --pointer-x: 50%;
+  --pointer-y: 38%;
 }
 
 *,
@@ -42,7 +44,7 @@ body {
 }
 
 ::selection {
-  background: rgba(201, 163, 106, 0.28);
+  background: rgba(200, 75, 75, 0.28);
   color: #fff8ee;
 }
 
@@ -113,9 +115,30 @@ a:focus-visible,
 .atmosphere {
   z-index: 0;
   background:
-    radial-gradient(circle at 50% 38%, transparent 18%, rgba(0, 0, 0, 0.42) 62%, rgba(0, 0, 0, 0.78) 100%),
-    radial-gradient(ellipse 58% 34% at 50% -8%, rgba(201, 163, 106, 0.07), transparent 58%),
-    linear-gradient(180deg, #0c0c0f 0%, #08080a 48%, #060607 100%);
+    radial-gradient(circle at 50% 42%, transparent 12%, rgba(0, 0, 0, 0.4) 58%, rgba(0, 0, 0, 0.74) 100%),
+    radial-gradient(ellipse 70% 40% at 18% 0%, rgba(200, 75, 75, 0.11), transparent 55%),
+    radial-gradient(ellipse 50% 36% at 88% 8%, rgba(92, 126, 196, 0.09), transparent 50%),
+    linear-gradient(180deg, #0a0a0c 0%, #070708 45%, #050506 100%);
+}
+
+.pointer-light {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    26rem circle at var(--pointer-x) var(--pointer-y),
+    rgba(236, 230, 220, 0.07),
+    transparent 62%
+  );
+  transition-property: opacity;
+  transition-duration: 280ms;
+  transition-timing-function: var(--ease);
+}
+
+.pointer-light.is-on {
+  opacity: 1;
 }
 
 .grain {
@@ -170,8 +193,15 @@ a:focus-visible,
   position: sticky;
   top: 0;
   z-index: 4;
-  background: color-mix(in srgb, var(--bg) 78%, transparent);
-  backdrop-filter: blur(18px) saturate(0.85);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(16px);
+  transition-property: background-color;
+  transition-duration: 220ms;
+  transition-timing-function: var(--ease);
+}
+
+.header.is-scrolled {
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
 }
 
 .header::after {
@@ -180,13 +210,14 @@ a:focus-visible,
   height: 1px;
   background: linear-gradient(
     90deg,
-    transparent 8%,
-    rgba(184, 72, 72, 0.42) 28%,
-    rgba(228, 195, 106, 0.7) 50%,
-    rgba(107, 127, 215, 0.38) 72%,
-    transparent 92%
+    transparent 4%,
+    #c84b4b 22%,
+    #e4c36a 42%,
+    #7ec8b3 62%,
+    #6b7fd7 80%,
+    transparent 96%
   );
-  opacity: 0.55;
+  opacity: 0.62;
 }
 
 .header-inner {
@@ -471,7 +502,6 @@ a:focus-visible,
 
 .category-nav a[aria-current="page"] {
   color: var(--text);
-  box-shadow: inset 0 -1px 0 var(--accent);
 }
 
 .blog-group + .blog-group {
@@ -549,7 +579,7 @@ a:focus-visible,
   height: 100%;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.45;
+  opacity: 0.62;
 }
 
 @media (max-width: 720px) {
@@ -580,6 +610,12 @@ a:focus-visible,
   }
 }
 
+@media (hover: none) {
+  .pointer-light {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -593,4 +629,7 @@ a:focus-visible,
     opacity: 1;
   }
 
+  .pointer-light {
+    display: none;
+  }
 }
