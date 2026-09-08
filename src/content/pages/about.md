@@ -1,5 +1,5 @@
 ---
-lede: hi! i'm MZ
+lede: hi! i'm Vvan1shmz
 goal: my life goal is to write things down until they become clear.
 beliefs:
   - Empty your mind
