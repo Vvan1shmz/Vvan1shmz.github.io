@@ -4,9 +4,11 @@
   const canvas = document.getElementById("constellation") as HTMLCanvasElement | null;
   if (canvas) {
     const ctx = canvas.getContext("2d");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (ctx) {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const points: { x: number; y: number }[] = [];
+      const points: { x: number; y: number; r: number; hue: number }[] = [];
+      let raf = 0;
 
       function resize() {
         canvas.width = Math.floor(window.innerWidth * dpr);
@@ -15,30 +17,32 @@
         canvas.style.height = `${window.innerHeight}px`;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         seed();
-        draw();
+        draw(0);
       }
 
       function seed() {
         points.length = 0;
-        const count = Math.round((window.innerWidth * window.innerHeight) / 28000);
-        for (let i = 0; i < Math.max(18, count); i++) {
+        const count = Math.round((window.innerWidth * window.innerHeight) / 24000);
+        for (let i = 0; i < Math.max(22, count); i++) {
           points.push({
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
+            r: 0.7 + Math.random() * 1.4,
+            hue: [0, 38, 195, 250][i % 4],
           });
         }
       }
 
-      function draw() {
+      function draw(t: number) {
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        ctx.lineWidth = 0.7;
+        ctx.lineWidth = 0.6;
         for (let i = 0; i < points.length; i++) {
           for (let j = i + 1; j < points.length; j++) {
             const dx = points[i].x - points[j].x;
             const dy = points[i].y - points[j].y;
             const dist = Math.hypot(dx, dy);
-            if (dist < 160) {
-              ctx.strokeStyle = `rgba(140, 90, 160, ${0.12 * (1 - dist / 160)})`;
+            if (dist < 150) {
+              ctx.strokeStyle = `hsla(${points[i].hue}, 45%, 68%, ${0.08 * (1 - dist / 150)})`;
               ctx.beginPath();
               ctx.moveTo(points[i].x, points[i].y);
               ctx.lineTo(points[j].x, points[j].y);
@@ -47,15 +51,33 @@
           }
         }
         for (const p of points) {
-          ctx.fillStyle = "rgba(120, 80, 150, 0.22)";
+          const pulse = reduceMotion ? 1 : 0.7 + Math.sin(t / 900 + p.x) * 0.3;
+          ctx.fillStyle = `hsla(${p.hue}, 30%, 82%, ${0.28 * pulse})`;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
           ctx.fill();
         }
       }
 
+      function loop(now: number) {
+        draw(now);
+        raf = requestAnimationFrame(loop);
+      }
+
       window.addEventListener("resize", resize);
       resize();
+      if (!reduceMotion) {
+        raf = requestAnimationFrame(loop);
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          cancelAnimationFrame(raf);
+        } else if (!reduceMotion) {
+          raf = requestAnimationFrame(loop);
+        }
+      });
+
     }
   }
 </script>
