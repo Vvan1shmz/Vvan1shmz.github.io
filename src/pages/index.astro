@@ -15,7 +15,7 @@ const mail = site.email ? `mailto:${site.email}` : site.social.github;
 <Layout>
   <div class="prose">
     <h1 class="lede">{about.data.lede}</h1>
-    <p>{about.data.goal}</p>
+    <p class="lede-sub">{about.data.goal}</p>
     <Content />
   </div>
 

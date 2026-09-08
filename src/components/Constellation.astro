@@ -22,27 +22,27 @@
 
       function seed() {
         points.length = 0;
-        const count = Math.round((window.innerWidth * window.innerHeight) / 24000);
-        for (let i = 0; i < Math.max(22, count); i++) {
+        const count = Math.round((window.innerWidth * window.innerHeight) / 42000);
+        for (let i = 0; i < Math.max(14, count); i++) {
           points.push({
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
-            r: 0.7 + Math.random() * 1.4,
-            hue: [0, 38, 195, 250][i % 4],
+            r: 0.5 + Math.random() * 1.05,
+            hue: [32, 28, 38, 210][i % 4],
           });
         }
       }
 
       function draw(t: number) {
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        ctx.lineWidth = 0.6;
+        ctx.lineWidth = 0.4;
         for (let i = 0; i < points.length; i++) {
           for (let j = i + 1; j < points.length; j++) {
             const dx = points[i].x - points[j].x;
             const dy = points[i].y - points[j].y;
             const dist = Math.hypot(dx, dy);
-            if (dist < 150) {
-              ctx.strokeStyle = `hsla(${points[i].hue}, 45%, 68%, ${0.08 * (1 - dist / 150)})`;
+            if (dist < 120) {
+              ctx.strokeStyle = `hsla(${points[i].hue}, 22%, 72%, ${0.05 * (1 - dist / 120)})`;
               ctx.beginPath();
               ctx.moveTo(points[i].x, points[i].y);
               ctx.lineTo(points[j].x, points[j].y);
@@ -51,8 +51,8 @@
           }
         }
         for (const p of points) {
-          const pulse = reduceMotion ? 1 : 0.7 + Math.sin(t / 900 + p.x) * 0.3;
-          ctx.fillStyle = `hsla(${p.hue}, 30%, 82%, ${0.28 * pulse})`;
+          const pulse = reduceMotion ? 1 : 0.82 + Math.sin(t / 1400 + p.x) * 0.18;
+          ctx.fillStyle = `hsla(${p.hue}, 18%, 86%, ${0.16 * pulse})`;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
           ctx.fill();
