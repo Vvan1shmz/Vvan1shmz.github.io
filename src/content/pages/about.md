@@ -7,10 +7,10 @@ beliefs:
   - All people are equal
   - Amor Fati
   - Consistency matters more than intensity
-  - tools should stay out of the way
-likes: study alone, serif type, open source, walking, making hard things simple, notebooks, the command line, well-written blogs, Led Zeppelin
+  - Discipline and Stay hard.
+likes: Thinking alone, Aerial Robotics, Calisthenics, Running, Skiing, Fender Guitar, Pink Floyd, Led Zeppelin, Valorant.
 dislikes:
-  - writing to be seen
+  - Overestimation of talent.
 ---
 
 this is my personal site. about is a short, honest introduction. [blog](/blog) is for longer notes. the page is meant to stay quiet: more whitespace, less decoration, easier to read.
