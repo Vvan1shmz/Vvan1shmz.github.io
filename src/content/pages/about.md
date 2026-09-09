@@ -2,7 +2,7 @@
 lede: "I'm Vvan1shmz."
 goal: my life goal is to achieve communism.
 beliefs:
-  - not pleased by things, not saddened by the self
+  - Meet triumph and disaster all the same.
   - Humanity defines meaning itself
   - All people are equal
   - Amor Fati

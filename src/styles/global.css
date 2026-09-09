@@ -59,7 +59,7 @@ html[data-lang="zh"] .lang-block[data-lang-panel="zh"] {
 }
 
 html[data-lang="zh"] body {
-  font-family: "Cormorant Garamond", "Songti SC", "Source Han Serif SC", "Noto Serif SC", serif;
+  font-family: "Times New Roman", Times, "Songti SC", "Source Han Serif SC", "Noto Serif SC", serif;
 }
 
 html[data-lang="zh"] .nav,
@@ -82,11 +82,11 @@ body {
 }
 
 body {
-  font-family: "Cormorant Garamond", "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-family: "Times New Roman", Times, Georgia, serif;
   font-size: 1.18rem;
   font-weight: 400;
   line-height: 1.68;
-  letter-spacing: 0.012em;
+  letter-spacing: 0.004em;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern" 1, "liga" 1;
 }
