@@ -34,8 +34,8 @@
 
       function seed() {
         points.length = 0;
-        const count = Math.round((window.innerWidth * window.innerHeight) / 28000);
-        for (let i = 0; i < Math.max(18, count); i++) {
+        const count = Math.round((window.innerWidth * window.innerHeight) / 24000);
+        for (let i = 0; i < Math.max(22, count); i++) {
           const x = Math.random() * window.innerWidth;
           const y = Math.random() * window.innerHeight;
           points.push({
@@ -45,7 +45,7 @@
             y,
             vx: 0,
             vy: 0,
-            r: 0.65 + Math.random() * 1.25,
+            r: 1.15 + Math.random() * 1.7,
             hue: [0, 38, 195, 250][i % 4],
           });
         }
@@ -54,7 +54,7 @@
       function nearCursor(px: number, py: number) {
         if (!mouse.on) return 0;
         const dist = Math.hypot(mouse.x - px, mouse.y - py);
-        return dist < 240 ? 1 - dist / 240 : 0;
+        return dist < 280 ? 1 - dist / 280 : 0;
       }
 
       function isLight() {
@@ -64,16 +64,16 @@
       function draw(t: number) {
         const light = isLight();
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        ctx.lineWidth = 0.55;
+        ctx.lineWidth = 0.8;
         for (let i = 0; i < points.length; i++) {
           for (let j = i + 1; j < points.length; j++) {
             const dx = points[i].x - points[j].x;
             const dy = points[i].y - points[j].y;
             const dist = Math.hypot(dx, dy);
-            if (dist < 150) {
+            if (dist < 170) {
               const heat = Math.max(nearCursor(points[i].x, points[i].y), nearCursor(points[j].x, points[j].y));
-              const alpha = (0.07 + heat * 0.16) * (1 - dist / 150);
-              ctx.strokeStyle = `hsla(${points[i].hue}, ${light ? 28 : 42}%, ${light ? 28 : 70}%, ${alpha})`;
+              const alpha = (0.12 + heat * 0.28) * (1 - dist / 170);
+              ctx.strokeStyle = `hsla(${points[i].hue}, ${light ? 32 : 48}%, ${light ? 26 : 76}%, ${alpha})`;
               ctx.beginPath();
               ctx.moveTo(points[i].x, points[i].y);
               ctx.lineTo(points[j].x, points[j].y);
@@ -82,11 +82,11 @@
           }
         }
         for (const p of points) {
-          const pulse = reduceMotion ? 1 : 0.75 + Math.sin(t / 1100 + p.x) * 0.25;
+          const pulse = reduceMotion ? 1 : 0.78 + Math.sin(t / 1100 + p.x) * 0.22;
           const heat = nearCursor(p.x, p.y);
-          ctx.fillStyle = `hsla(${p.hue}, ${light ? 22 : 28}%, ${light ? 24 : 84}%, ${(0.22 + heat * 0.45) * pulse})`;
+          ctx.fillStyle = `hsla(${p.hue}, ${light ? 24 : 32}%, ${light ? 22 : 88}%, ${(0.42 + heat * 0.5) * pulse})`;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r + heat * 0.8, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, p.r + heat * 1.7, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -100,8 +100,8 @@
               const dx = mouse.x - p.x;
               const dy = mouse.y - p.y;
               const dist = Math.hypot(dx, dy) || 1;
-              if (dist < 230) {
-                const pull = (1 - dist / 230) * 0.045;
+              if (dist < 260) {
+                const pull = (1 - dist / 260) * 0.06;
                 ax += dx * pull;
                 ay += dy * pull;
               }
