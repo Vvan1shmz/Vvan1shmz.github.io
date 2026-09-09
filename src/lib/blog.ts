@@ -5,7 +5,8 @@ export type BlogPost = CollectionEntry<"blog">;
 
 export async function getPublishedPosts(): Promise<BlogPost[]> {
   try {
-    return (await getCollection("blog", ({ data }) => !data.draft)).sort(
+    const showDrafts = import.meta.env.DEV;
+    return (await getCollection("blog", ({ data }) => showDrafts || !data.draft)).sort(
       (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
     );
   } catch {

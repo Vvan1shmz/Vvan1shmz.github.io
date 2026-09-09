@@ -22,13 +22,25 @@ if (!allowed.has(category)) {
   process.exit(1);
 }
 
-const slug = title
-  .normalize("NFKD")
-  .replace(/[^\w\s-]/g, "")
-  .trim()
-  .toLowerCase()
-  .replace(/[\s_]+/g, "-")
-  .replace(/-+/g, "-");
+function toSlug(value) {
+  const ascii = value
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, "-")
+    .replace(/-+/g, "-");
+  if (ascii && ascii !== "category") return ascii;
+
+  return value
+    .trim()
+    .replace(/[\\/:*?"<>|#%{}\\^~[\]`]+/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+const slug = toSlug(title);
 
 if (!slug || slug === "category") {
   console.error("That title does not make a usable filename.");
@@ -65,4 +77,4 @@ draft: true
 );
 
 console.log(`Created src/content/blog/${slug}.md (${category}, draft)`);
-console.log("Set draft: false when it should go on the site, then run npm run build.");
+console.log("Preview with npm run dev. Publish with npm run publish-post -- " + slug);

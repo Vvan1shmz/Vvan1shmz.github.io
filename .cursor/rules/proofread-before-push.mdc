@@ -17,4 +17,4 @@ Keep the site voice: mostly lowercase, short sentences, no marketing phrasing. F
 ✅ research
 ```
 
-After copy fixes, run `npm run build` so `docs/` matches, then commit source + `docs/` and push. Do not commit `.cursor/skills/`.
+After copy fixes, proofread, then commit source and push. A GitHub Action rebuilds `docs/` on `main`. Do not commit `.cursor/skills/`. Run `npm run build` locally only when you need to check the static output yourself.
