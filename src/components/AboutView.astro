@@ -1,14 +1,14 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { render } from "astro:content";
+import ContactLine from "./ContactLine.astro";
 
 interface Props {
   about: CollectionEntry<"pages">;
   lang: "en" | "zh";
-  mail: string;
 }
 
-const { about, lang, mail } = Astro.props;
+const { about, lang } = Astro.props;
 const { Content } = await render(about);
 
 const copy =
@@ -17,17 +17,11 @@ const copy =
         beliefs: "这些是我相信的：",
         likes: "这些是我喜欢的：",
         dislikes: "这些我不喜欢：",
-        contactBefore: "我喜欢和人来往，会回信。",
-        contactLink: "给我发消息",
-        contactAfter: "（github 现在大概也能用）",
       }
     : {
         beliefs: "here are some things i believe in:",
         likes: "here are some things i like:",
         dislikes: "things i don't like:",
-        contactBefore: "i like people and write back. ",
-        contactLink: "send me a message",
-        contactAfter: " (github probably works for now)",
       };
 ---
 
@@ -58,8 +52,6 @@ const copy =
   </section>
 
   <section class="section prose">
-    <p>
-      {copy.contactBefore}<a href={mail}>{copy.contactLink}</a>{copy.contactAfter}
-    </p>
+    <ContactLine lang={lang} />
   </section>
 </div>

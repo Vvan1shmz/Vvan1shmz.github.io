@@ -1,16 +1,15 @@
 ---
 lede: "我是 Vvan1shmz."
-goal: 我的人生目标，是把事情写下来，直到它们变得清楚。
+goal: 我的人生目标，是实现共产主义。
 beliefs:
-  - 清空头脑
+  - 不以物喜，不以己悲
   - 意义由人自己定义
   - 人人平等
-  - Amor Fati
+  - 热爱命运
   - 坚持比爆发更重要
-  - Discipline and Stay hard.
-likes: 独自思考、Aerial Robotics、徒手健身、跑步、滑雪、Fender 吉他、Pink Floyd、Led Zeppelin、Valorant。
+likes: 独自思考、无人机、徒手健身、跑步、滑雪、Fender 吉他、平克·弗洛伊德、齐柏林飞艇、瓦罗兰特。
 dislikes:
-  - 高估天赋。
+  - 高估天赋而低估努力的作用。
 ---
 
-这是我的个人站点。关于页是一段短而诚实的介绍。[博客](/blog) 用来写更长的笔记。这页想保持安静：多留空白，少做装饰，更好读。
+这是我的个人站点。

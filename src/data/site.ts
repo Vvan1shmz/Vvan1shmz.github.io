@@ -5,6 +5,7 @@ export const site = {
   description: "vvan1shmz's personal site: a short about page and a quiet blog.",
   url: "https://vvan1shmz.github.io",
   email: "vvan1shmz@gmail.com",
+  emails: ["vvan1shmz@gmail.com", "3024915692@qq.com"],
   social: {
     github: "https://github.com/Vvan1shmz",
     x: "",

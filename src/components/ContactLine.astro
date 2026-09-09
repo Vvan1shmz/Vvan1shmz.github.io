@@ -1,0 +1,122 @@
+---
+import { site } from "../data/site";
+
+interface Props {
+  lang: "en" | "zh";
+}
+
+const { lang } = Astro.props;
+const panelId = `mail-panel-${lang}`;
+const copy =
+  lang === "zh"
+    ? {
+        before: "通常会回信。",
+        trigger: "给我发消息",
+        after: "。",
+        panel: "邮箱",
+      }
+    : {
+        before: "i usually write back. ",
+        trigger: "send me a message",
+        after: ".",
+        panel: "email",
+      };
+---
+
+<p class="contact-line">
+  {copy.before}<span class="mail-pop"
+    >    <button
+      type="button"
+      class="mail-pop-trigger"
+      aria-expanded="false"
+      aria-controls={panelId}
+    >
+      {copy.trigger}<span class="mail-pop-dots" aria-hidden="true">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">
+          <path d="M1.4 2.2a1.2 1.2 0 0 1 1.2-1.2h6.8a1.2 1.2 0 0 1 1.2 1.2v4.4a1.2 1.2 0 0 1-1.2 1.2H5.8L3 10V7.8H2.6a1.2 1.2 0 0 1-1.2-1.2V2.2Z"></path>
+          <circle cx="4" cy="4.5" r="0.55" fill="currentColor" stroke="none"></circle>
+          <circle cx="6.6" cy="4.5" r="0.55" fill="currentColor" stroke="none"></circle>
+          <circle cx="9.2" cy="4.5" r="0.55" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </span>
+    </button><span class="mail-pop-panel" id={panelId} hidden role="region" aria-label={copy.panel}>
+      {
+        site.emails.map((address) => (
+          <a href={`mailto:${address}`}>{address}</a>
+        ))
+      }
+    </span></span
+  >{copy.after}
+</p>
+
+<script>
+  function placePanel(root: HTMLElement) {
+    const panel = root.querySelector(".mail-pop-panel");
+    if (!(panel instanceof HTMLElement)) return;
+    panel.classList.remove("is-above");
+    const rect = panel.getBoundingClientRect();
+    if (rect.bottom > window.innerHeight - 12) {
+      panel.classList.add("is-above");
+    }
+  }
+
+  function closePop(root: HTMLElement) {
+    const trigger = root.querySelector(".mail-pop-trigger");
+    const panel = root.querySelector(".mail-pop-panel");
+    if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement)) return;
+    trigger.setAttribute("aria-expanded", "false");
+    panel.hidden = true;
+    panel.classList.remove("is-above");
+  }
+
+  function closeAll(except?: HTMLElement) {
+    document.querySelectorAll(".mail-pop").forEach((node) => {
+      if (node instanceof HTMLElement && node !== except) closePop(node);
+    });
+  }
+
+  function togglePop(root: HTMLElement) {
+    const trigger = root.querySelector(".mail-pop-trigger");
+    const panel = root.querySelector(".mail-pop-panel");
+    if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement)) return;
+    const open = trigger.getAttribute("aria-expanded") === "true";
+    if (open) {
+      closePop(root);
+      return;
+    }
+    closeAll(root);
+    trigger.setAttribute("aria-expanded", "true");
+    panel.hidden = false;
+    void panel.offsetHeight;
+    placePanel(root);
+    requestAnimationFrame(() => placePanel(root));
+  }
+
+  document.querySelectorAll(".mail-pop").forEach((node) => {
+    if (!(node instanceof HTMLElement)) return;
+    const trigger = node.querySelector(".mail-pop-trigger");
+    trigger?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      togglePop(node);
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Node)) return;
+    const open = document.querySelector('.mail-pop-trigger[aria-expanded="true"]')?.closest(".mail-pop");
+    if (open instanceof HTMLElement && !open.contains(target)) closeAll();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const openTrigger = document.querySelector('.mail-pop-trigger[aria-expanded="true"]');
+    closeAll();
+    if (openTrigger instanceof HTMLButtonElement) openTrigger.focus();
+  });
+
+  new MutationObserver(() => closeAll()).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-lang"],
+  });
+</script>
