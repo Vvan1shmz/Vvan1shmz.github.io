@@ -1,0 +1,15 @@
+---
+description: After local site changes, commit and push so the live site updates
+alwaysApply: true
+---
+
+# Ship local changes
+
+After finishing local edits, go live without waiting for the user to ask.
+
+1. Proofread user-facing English in the change (see proofread-before-push).
+2. Commit the relevant source. Do not commit `.cursor/skills/` or secrets.
+3. Small content, copy, or CSS fixes: commit on `main` and `git push`. Larger features may still use a PR; merge and push when ready.
+4. A GitHub Action rebuilds `docs/` on `main`. Do not manually commit `docs/` unless the Action fails.
+
+Do not change language/theme toggles, the constellation, or the mail bubble unless the user asks.
