@@ -537,20 +537,23 @@ html[data-theme="light"] .pref-moon {
 .mail-pop-trigger {
   appearance: none;
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2rem;
   margin: 0;
-  padding: 0;
+  padding: 0.06rem 0.34rem;
   border: 0;
+  border-radius: 0.45rem;
   background: transparent;
   font: inherit;
   letter-spacing: inherit;
   color: inherit;
   cursor: pointer;
-  text-underline-offset: 0.22em;
+  text-underline-offset: 0.24em;
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-decoration-color: color-mix(in srgb, var(--text) 42%, transparent);
-  transition-property: color, text-decoration-color, opacity, transform;
+  text-decoration-color: color-mix(in srgb, var(--text) 55%, transparent);
+  transition-property: color, text-decoration-color, background-color, box-shadow, transform;
   transition-duration: 180ms;
   transition-timing-function: var(--ease);
 }
@@ -561,13 +564,39 @@ html[data-theme="light"] .pref-moon {
   inset: -0.35rem -0.12rem;
 }
 
-.mail-pop-trigger:hover {
+.mail-pop-trigger:hover,
+.mail-pop-trigger[aria-expanded="true"] {
   color: #fff8ee;
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: inset 0 0 0 1px var(--line);
   text-decoration-color: var(--accent);
 }
 
-html[data-theme="light"] .mail-pop-trigger:hover {
+html[data-theme="light"] .mail-pop-trigger:hover,
+html[data-theme="light"] .mail-pop-trigger[aria-expanded="true"] {
   color: #1a1512;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.mail-pop-dots {
+  display: inline-flex;
+  transform: translateY(1px);
+}
+
+.mail-pop-dots svg {
+  width: 0.68rem;
+  height: 0.68rem;
+  display: block;
+  opacity: 0.72;
+  transition-property: opacity, transform;
+  transition-duration: 180ms;
+  transition-timing-function: var(--ease);
+}
+
+.mail-pop-trigger:hover .mail-pop-dots svg,
+.mail-pop-trigger[aria-expanded="true"] .mail-pop-dots svg {
+  opacity: 1;
+  transform: translateY(-1px);
 }
 
 .mail-pop-trigger:active {

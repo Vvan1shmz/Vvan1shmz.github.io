@@ -2,15 +2,14 @@
 lede: "I'm Vvan1shmz."
 goal: my life goal is to achieve communism.
 beliefs:
-  - Empty your mind
+  - not pleased by things, not saddened by the self
   - Humanity defines meaning itself
   - All people are equal
   - Amor Fati
   - Consistency matters more than intensity
-  - Discipline and Stay hard.
-likes: Thinking alone, Aerial Robotics, Calisthenics, Running, Skiing, Fender Guitar, Pink Floyd, Led Zeppelin, Valorant.
+likes: Thinking alone, drones, Calisthenics, Running, Skiing, Fender Guitar, Pink Floyd, Led Zeppelin, Valorant.
 dislikes:
-  - Overestimation of talent.
+  - Overestimation of talent and underestimation of effort.
 ---
 
-this is my personal site. about is a short, honest introduction. [blog](/blog) is for longer notes. the page is meant to stay quiet: more whitespace, less decoration, easier to read.
+this is my personal site.
