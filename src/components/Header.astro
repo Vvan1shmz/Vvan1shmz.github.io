@@ -1,5 +1,6 @@
 ---
 import { site } from "../data/site";
+import Lang from "./Lang.astro";
 
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 ---
@@ -21,8 +22,12 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
       {site.name}
     </a>
     <nav class="nav" aria-label="primary">
-      <a href="/" aria-current={path === "/" ? "page" : undefined}>About</a>
-      <a href="/blog" aria-current={path.startsWith("/blog") ? "page" : undefined}>Blog</a>
+      <a href="/" aria-current={path === "/" ? "page" : undefined}>
+        <Lang en="About" zh="关于" />
+      </a>
+      <a href="/blog" aria-current={path.startsWith("/blog") ? "page" : undefined}>
+        <Lang en="Blog" zh="博客" />
+      </a>
     </nav>
     <div class="social">
       {
@@ -52,6 +57,33 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
           </a>
         )
       }
+      <button type="button" class="pref pref-lang" id="lang-toggle" aria-label="switch to chinese">
+        <span data-lang-panel="en">中</span>
+        <span data-lang-panel="zh">EN</span>
+      </button>
+      <button
+        type="button"
+        class="pref pref-theme"
+        id="theme-toggle"
+        aria-label="switch to light theme"
+        aria-pressed="false"
+      >
+        <span class="pref-swap" aria-hidden="true">
+          <svg class="pref-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="12" cy="12" r="3.6"></circle>
+            <path
+              stroke-linecap="round"
+              d="M12 3.2v1.7M12 19.1v1.7M4.5 4.5l1.2 1.2M18.3 18.3l1.2 1.2M3.2 12h1.7M19.1 12h1.7M4.5 19.5l1.2-1.2M18.3 5.7l1.2-1.2"
+            ></path>
+          </svg>
+          <svg class="pref-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path
+              stroke-linejoin="round"
+              d="M16.2 13.4A6.4 6.4 0 0 1 10.6 5.5 6.6 6.6 0 1 0 16.2 13.4Z"
+            ></path>
+          </svg>
+        </span>
+      </button>
     </div>
   </div>
 </header>
@@ -65,4 +97,75 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
   }
+
+  const THEME_KEY = "vvan1shmz-theme";
+  const LANG_KEY = "vvan1shmz-lang";
+  const LIGHT_COLOR = "#f4efe6";
+  const DARK_COLOR = "#070708";
+
+  function currentTheme() {
+    return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+  }
+
+  function currentLang() {
+    return document.documentElement.getAttribute("data-lang") === "zh" ? "zh" : "en";
+  }
+
+  function syncButtons() {
+    const themeBtn = document.getElementById("theme-toggle");
+    const langBtn = document.getElementById("lang-toggle");
+    const light = currentTheme() === "light";
+    const zh = currentLang() === "zh";
+
+    if (themeBtn instanceof HTMLButtonElement) {
+      themeBtn.setAttribute("aria-pressed", light ? "true" : "false");
+      themeBtn.setAttribute(
+        "aria-label",
+        zh
+          ? light
+            ? "切换到深色主题"
+            : "切换到浅色主题"
+          : light
+            ? "switch to dark theme"
+            : "switch to light theme",
+      );
+    }
+
+    if (langBtn instanceof HTMLButtonElement) {
+      langBtn.setAttribute("aria-label", zh ? "切换到英文" : "switch to chinese");
+    }
+  }
+
+  function applyTheme(theme: "light" | "dark") {
+    document.documentElement.setAttribute("data-theme", theme);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", theme === "light" ? LIGHT_COLOR : DARK_COLOR);
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {
+      /* private mode */
+    }
+    syncButtons();
+  }
+
+  function applyLang(lang: "en" | "zh") {
+    document.documentElement.setAttribute("data-lang", lang);
+    document.documentElement.lang = lang === "zh" ? "zh-Hans" : "en";
+    try {
+      localStorage.setItem(LANG_KEY, lang);
+    } catch {
+      /* private mode */
+    }
+    syncButtons();
+  }
+
+  const themeBtn = document.getElementById("theme-toggle");
+  const langBtn = document.getElementById("lang-toggle");
+  themeBtn?.addEventListener("click", () => {
+    applyTheme(currentTheme() === "light" ? "dark" : "light");
+  });
+  langBtn?.addEventListener("click", () => {
+    applyLang(currentLang() === "zh" ? "en" : "zh");
+  });
+  syncButtons();
 </script>

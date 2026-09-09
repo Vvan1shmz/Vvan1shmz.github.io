@@ -1,0 +1,65 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { render } from "astro:content";
+
+interface Props {
+  about: CollectionEntry<"pages">;
+  lang: "en" | "zh";
+  mail: string;
+}
+
+const { about, lang, mail } = Astro.props;
+const { Content } = await render(about);
+
+const copy =
+  lang === "zh"
+    ? {
+        beliefs: "这些是我相信的：",
+        likes: "这些是我喜欢的：",
+        dislikes: "这些我不喜欢：",
+        contactBefore: "我喜欢和人来往，会回信。",
+        contactLink: "给我发消息",
+        contactAfter: "（github 现在大概也能用）",
+      }
+    : {
+        beliefs: "here are some things i believe in:",
+        likes: "here are some things i like:",
+        dislikes: "things i don't like:",
+        contactBefore: "i like people and write back. ",
+        contactLink: "send me a message",
+        contactAfter: " (github probably works for now)",
+      };
+---
+
+<div class="lang-block" data-lang-panel={lang}>
+  <div class="prose">
+    <h1 class="lede">{about.data.lede}</h1>
+    <p class="lede-sub">{about.data.goal}</p>
+    <Content />
+  </div>
+
+  <section class="section">
+    <h2>{copy.beliefs}</h2>
+    <ul class="beliefs">
+      {about.data.beliefs.map((item) => <li>{item}</li>)}
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>{copy.likes}</h2>
+    <p class="likes">{about.data.likes}</p>
+  </section>
+
+  <section class="section">
+    <h2>{copy.dislikes}</h2>
+    <ul class="list">
+      {about.data.dislikes.map((item) => <li>{item}</li>)}
+    </ul>
+  </section>
+
+  <section class="section prose">
+    <p>
+      {copy.contactBefore}<a href={mail}>{copy.contactLink}</a>{copy.contactAfter}
+    </p>
+  </section>
+</div>

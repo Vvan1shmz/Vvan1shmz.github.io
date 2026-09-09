@@ -2,6 +2,7 @@
 import Layout from "../../../layouts/Layout.astro";
 import CategoryNav from "../../../components/CategoryNav.astro";
 import PostList from "../../../components/PostList.astro";
+import Lang from "../../../components/Lang.astro";
 import { categories, type CategoryId } from "../../../data/categories";
 import {
   getPublishedPosts,
@@ -39,14 +40,14 @@ const used = usedCategories(posts);
   title={`${category.label} · Blog · vvan1shmz`}
   description={`Posts in ${category.label}.`}
 >
-  <a class="back" href="/blog">Blog</a>
-  <h1 class="page-kicker">{category.label}</h1>
+  <a class="back" href="/blog"><Lang en="Blog" zh="博客" /></a>
+  <h1 class="page-kicker"><Lang en={category.label} zh={category.labelZh} /></h1>
   <CategoryNav current={categoryId} used={used} />
   {
     filtered.length ? (
       <PostList posts={filtered} />
     ) : (
-      <p class="empty">nothing here yet.</p>
+      <p class="empty"><Lang en="nothing here yet." zh="还没有内容。" /></p>
     )
   }
 </Layout>

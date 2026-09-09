@@ -1,6 +1,6 @@
 [
-  { "id": "notes", "label": "notes" },
-  { "id": "reading", "label": "reading" },
-  { "id": "making", "label": "making" },
-  { "id": "research", "label": "research" }
+  { "id": "notes", "label": "notes", "labelZh": "笔记" },
+  { "id": "reading", "label": "reading", "labelZh": "阅读" },
+  { "id": "making", "label": "making", "labelZh": "制作" },
+  { "id": "research", "label": "research", "labelZh": "研究" }
 ]

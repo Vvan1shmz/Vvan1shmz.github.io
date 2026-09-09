@@ -14,13 +14,29 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="theme-color" content="#070708" />
+    <script is:inline>
+      (function () {
+        try {
+          var theme = localStorage.getItem("vvan1shmz-theme");
+          var lang = localStorage.getItem("vvan1shmz-lang");
+          if (theme !== "light" && theme !== "dark") theme = "dark";
+          if (lang !== "zh" && lang !== "en") lang = "en";
+          var html = document.documentElement;
+          html.setAttribute("data-theme", theme);
+          html.setAttribute("data-lang", lang);
+          html.lang = lang === "zh" ? "zh-Hans" : "en";
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute("content", theme === "light" ? "#f4efe6" : "#070708");
+        } catch (e) {}
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#070708" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,7 +52,10 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
     <title>{title}</title>
   </head>
   <body>
-    <a class="skip-link" href="#content">Skip to content</a>
+    <a class="skip-link" href="#content">
+      <span data-lang-panel="en">Skip to content</span>
+      <span data-lang-panel="zh">跳到正文</span>
+    </a>
     <div class="atmosphere" aria-hidden="true"></div>
     <Constellation />
     <div class="pointer-light" id="pointer-light" aria-hidden="true"></div>
