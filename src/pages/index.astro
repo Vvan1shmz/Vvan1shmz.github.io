@@ -2,18 +2,15 @@
 import Layout from "../layouts/Layout.astro";
 import AboutView from "../components/AboutView.astro";
 import { getEntry } from "astro:content";
-import { site } from "../data/site";
 
 const about = await getEntry("pages", "about");
 const aboutZh = await getEntry("pages", "about-zh");
 if (!about || !aboutZh) {
   throw new Error("Missing src/content/pages/about.md or about-zh.md");
 }
-
-const mail = site.email ? `mailto:${site.email}` : site.social.github;
 ---
 
 <Layout>
-  <AboutView about={about} lang="en" mail={mail} />
-  <AboutView about={aboutZh} lang="zh" mail={mail} />
+  <AboutView about={about} lang="en" />
+  <AboutView about={aboutZh} lang="zh" />
 </Layout>
