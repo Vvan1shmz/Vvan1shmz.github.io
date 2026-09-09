@@ -1,6 +1,6 @@
 ---
 lede: "I'm Vvan1shmz."
-goal: my life goal is to write things down until they become clear.
+goal: my life goal is to achieve communism.
 beliefs:
   - Empty your mind
   - Humanity defines meaning itself
