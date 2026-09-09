@@ -2,6 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import CategoryNav from "../../components/CategoryNav.astro";
 import PostList from "../../components/PostList.astro";
+import Lang from "../../components/Lang.astro";
 import { getPublishedPosts, groupedPosts, usedCategories } from "../../lib/blog";
 
 const posts = await getPublishedPosts();
@@ -10,25 +11,24 @@ const used = usedCategories(posts);
 ---
 
 <Layout title="Blog · vvan1shmz" description="Posts from vvan1shmz.">
+  <h1 class="page-kicker"><Lang en="blog" zh="博客" /></h1>
   {
     posts.length ? (
       <>
-        <h1 class="page-kicker">blog</h1>
         <CategoryNav current="all" used={used} />
         {groups.map((group) => (
           <section class="blog-group" aria-labelledby={`cat-${group.id}`}>
             <h2 class="blog-group-title" id={`cat-${group.id}`}>
-              <a href={`/blog/category/${group.id}`}>{group.label}</a>
+              <a href={`/blog/category/${group.id}`}>
+                <Lang en={group.label} zh={group.labelZh} />
+              </a>
             </h2>
             <PostList posts={group.posts} />
           </section>
         ))}
       </>
     ) : (
-      <>
-        <h1 class="page-kicker">blog</h1>
-        <p class="empty">nothing here yet.</p>
-      </>
+      <p class="empty"><Lang en="nothing here yet." zh="还没有内容。" /></p>
     )
   }
 </Layout>

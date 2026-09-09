@@ -1,9 +1,10 @@
 ---
 import type { CategoryId } from "../data/categories";
+import Lang from "./Lang.astro";
 
 interface Props {
   current?: "all" | CategoryId;
-  used: { id: string; label: string }[];
+  used: { id: string; label: string; labelZh: string }[];
 }
 
 const { current = "all", used } = Astro.props;
@@ -13,14 +14,14 @@ const { current = "all", used } = Astro.props;
   used.length > 0 && (
     <nav class="category-nav" aria-label="categories">
       <a href="/blog" aria-current={current === "all" ? "page" : undefined}>
-        all
+        <Lang en="all" zh="全部" />
       </a>
       {used.map((category) => (
         <a
           href={`/blog/category/${category.id}`}
           aria-current={current === category.id ? "page" : undefined}
         >
-          {category.label}
+          <Lang en={category.label} zh={category.labelZh} />
         </a>
       ))}
     </nav>

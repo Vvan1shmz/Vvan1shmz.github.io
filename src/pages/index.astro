@@ -1,46 +1,19 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { getEntry, render } from "astro:content";
+import AboutView from "../components/AboutView.astro";
+import { getEntry } from "astro:content";
 import { site } from "../data/site";
 
 const about = await getEntry("pages", "about");
-if (!about) {
-  throw new Error("Missing src/content/pages/about.md");
+const aboutZh = await getEntry("pages", "about-zh");
+if (!about || !aboutZh) {
+  throw new Error("Missing src/content/pages/about.md or about-zh.md");
 }
 
-const { Content } = await render(about);
 const mail = site.email ? `mailto:${site.email}` : site.social.github;
 ---
 
 <Layout>
-  <div class="prose">
-    <h1 class="lede">{about.data.lede}</h1>
-    <p class="lede-sub">{about.data.goal}</p>
-    <Content />
-  </div>
-
-  <section class="section">
-    <h2>here are some things i believe in:</h2>
-    <ul class="beliefs">
-      {about.data.beliefs.map((item) => <li>{item}</li>)}
-    </ul>
-  </section>
-
-  <section class="section">
-    <h2>here are some things i like:</h2>
-    <p class="likes">{about.data.likes}</p>
-  </section>
-
-  <section class="section">
-    <h2>things i don't like:</h2>
-    <ul class="list">
-      {about.data.dislikes.map((item) => <li>{item}</li>)}
-    </ul>
-  </section>
-
-  <section class="section prose">
-    <p>
-      i like people and write back. <a href={mail}>send me a message</a> (github probably works for now)
-    </p>
-  </section>
+  <AboutView about={about} lang="en" mail={mail} />
+  <AboutView about={aboutZh} lang="zh" mail={mail} />
 </Layout>
