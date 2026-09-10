@@ -7,7 +7,7 @@ beliefs:
   - All people are equal
   - Amor Fati
   - Consistency matters more than intensity
-likes: Thinking alone, drones, Calisthenics, Running, Skiing, Fender Guitar, Pink Floyd, Led Zeppelin, Valorant.
+likes: Thinking alone, Drones, Calisthenics, Running, Skiing, Fender Guitar, Pink Floyd, Led Zeppelin, Valorant.
 dislikes:
   - Overestimation of talent and underestimation of effort.
 ---
