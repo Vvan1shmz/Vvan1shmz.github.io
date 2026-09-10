@@ -1,5 +1,7 @@
 ---
+import Lang from "./Lang.astro";
 import { formatDate, type BlogPost } from "../lib/blog";
+import { titlesForPost } from "../lib/bilingual";
 
 interface Props {
   posts: BlogPost[];
@@ -10,13 +12,18 @@ const { posts } = Astro.props;
 
 <ul class="blog-list">
   {
-    posts.map((post) => (
-      <li class="blog-item">
-        <time class="blog-date" datetime={post.data.date.toISOString()}>
-          {formatDate(post.data.date)}
-        </time>
-        <a href={`/blog/${post.id}`}>{post.data.title}</a>
-      </li>
-    ))
+    posts.map((post) => {
+      const titles = titlesForPost(post.data);
+      return (
+        <li class="blog-item">
+          <time class="blog-date" datetime={post.data.date.toISOString()}>
+            {formatDate(post.data.date)}
+          </time>
+          <a href={`/blog/${post.id}`}>
+            <Lang en={titles.en || titles.zh} zh={titles.zh || titles.en} />
+          </a>
+        </li>
+      );
+    })
   }
 </ul>

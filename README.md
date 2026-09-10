@@ -41,6 +41,8 @@ Then commit and push the new files under `src/content/blog/` (and `inbox/.sync-s
 
 The script also reads `inbox/diary/` in this repo, so notes that are already on GitHub can sync in the cloud.
 
+Posts are bilingual. Source language is `lang: en` or `lang: zh`. Put the other title in `titleOther`, and split the body with `<!--lang:en-->` / `<!--lang:zh-->`. The site language toggle switches which version you see. Missing translations fall back to the source text with a short note.
+
 ## About
 
 English: `src/content/pages/about.md`  

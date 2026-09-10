@@ -156,16 +156,68 @@ function yamlQuote(value) {
   return JSON.stringify(String(value ?? ""));
 }
 
-function buildPost({ title, date, description, category, body }) {
+function detectSourceLang(text) {
+  const cjk = (text.match(/[\u4e00-\u9fff]/g) ?? []).length;
+  const latin = (text.match(/[A-Za-z]/g) ?? []).length;
+  return cjk > latin ? "zh" : "en";
+}
+
+function splitBilingualBody(body, source) {
+  const text = body.replace(/^\uFEFF/, "");
+  const parts = text.split(/<!--\s*lang:(en|zh)\s*-->/i);
+  if (parts.length === 1) {
+    return source === "en"
+      ? { en: text.trim(), zh: "" }
+      : { en: "", zh: text.trim() };
+  }
+  const out = { en: "", zh: "" };
+  let current = null;
+  for (const part of parts) {
+    const key = part.trim().toLowerCase();
+    if (key === "en" || key === "zh") {
+      current = key;
+      continue;
+    }
+    if (!current) continue;
+    out[current] = part.trim();
+  }
+  if (!out.en && !out.zh) {
+    return source === "en"
+      ? { en: text.trim(), zh: "" }
+      : { en: "", zh: text.trim() };
+  }
+  return out;
+}
+
+function buildPost({
+  title,
+  titleOther,
+  description,
+  descriptionOther,
+  lang,
+  date,
+  category,
+  bodies,
+}) {
+  const en = bodies.en?.trim() ?? "";
+  const zh = bodies.zh?.trim() ?? "";
   return `---
 title: ${yamlQuote(title)}
-date: ${date}
+titleOther: ${yamlQuote(titleOther)}
 description: ${yamlQuote(description)}
+descriptionOther: ${yamlQuote(descriptionOther)}
+lang: ${lang}
+date: ${date}
 category: ${category}
 draft: false
 ---
 
-${body.trim()}\n`;
+<!--lang:en-->
+${en}
+
+<!--lang:zh-->
+${zh}
+`;
 }
 
 function normalizeDate(value, fallbackName) {
@@ -235,10 +287,25 @@ for (const source of sources) {
     );
     const title = stripCategoryMarks(rawTitle) || rawTitle;
     const date = normalizeDate(data.date, basename(file, ".md"));
+    const lang =
+      data.lang === "en" || data.lang === "zh"
+        ? data.lang
+        : detectSourceLang(`${title}\n${body}`);
+    const bodies = splitBilingualBody(body, lang);
     const description =
       (typeof data.description === "string" && data.description) ||
-      firstParagraph(body) ||
+      firstParagraph(bodies[lang] || body) ||
       title;
+    const titleOther =
+      (typeof data.titleOther === "string" && data.titleOther) ||
+      (typeof data.title_zh === "string" && data.title_zh) ||
+      (typeof data.title_en === "string" && data.title_en) ||
+      "";
+    const descriptionOther =
+      (typeof data.descriptionOther === "string" && data.descriptionOther) ||
+      (typeof data.description_zh === "string" && data.description_zh) ||
+      (typeof data.description_en === "string" && data.description_en) ||
+      "";
     const slugBase = toSlug(
       (typeof data.slug === "string" && data.slug) || `${date}-${title}`,
     );
@@ -256,15 +323,24 @@ for (const source of sources) {
       n += 1;
     }
 
-    const post = buildPost({ title, date, description, category, body });
+    const post = buildPost({
+      title,
+      titleOther,
+      description,
+      descriptionOther,
+      lang,
+      date,
+      category,
+      bodies,
+    });
     if (dryRun) {
-      created.push(`${rel} -> ${slug}.md (${category}) [dry-run]`);
+      created.push(`${rel} -> ${slug}.md (${category}, ${lang}) [dry-run]`);
       continue;
     }
 
     writeFileSync(outPath, post);
     state.files[rel] = { hash: digest, slug, category, syncedAt: new Date().toISOString() };
-    created.push(`${rel} -> src/content/blog/${slug}.md (${category})`);
+    created.push(`${rel} -> src/content/blog/${slug}.md (${category}, ${lang})`);
   }
 }
 

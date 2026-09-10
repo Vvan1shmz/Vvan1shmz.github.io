@@ -1,7 +1,13 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Lang from "../../components/Lang.astro";
-import { render } from "astro:content";
+import {
+  descriptionsForPost,
+  renderMarkdown,
+  splitBilingualBody,
+  titlesForPost,
+  type PostLang,
+} from "../../lib/bilingual";
 import { formatDate, getPublishedPosts } from "../../lib/blog";
 import { getCategory } from "../../data/categories";
 
@@ -14,27 +20,83 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const source = (post.data.lang ?? "en") as PostLang;
+const titles = titlesForPost(post.data);
+const descriptions = descriptionsForPost(post.data);
+const bodies = splitBilingualBody(post.body ?? "", source);
+const html = {
+  en: bodies.en ? await renderMarkdown(bodies.en) : "",
+  zh: bodies.zh ? await renderMarkdown(bodies.zh) : "",
+};
 const category = getCategory(post.data.category);
+
+function panel(lang: PostLang) {
+  const title = titles[lang] || titles[source];
+  const bodyHtml = html[lang] || html[source];
+  const hasOwn = Boolean(titles[lang] && html[lang]);
+  const isTranslation = hasOwn && lang !== source;
+  const missing = !html[lang] && Boolean(html[source]);
+  return { title, bodyHtml, hasOwn, isTranslation, missing };
+}
+
+const en = panel("en");
+const zh = panel("zh");
+const metaDescription = descriptions.en || descriptions.zh || post.data.description;
 ---
 
-<Layout title={`${post.data.title} · vvan1shmz`} description={post.data.description}>
+<Layout title={`${titles.en || titles.zh} · vvan1shmz`} description={metaDescription}>
   <a class="back" href="/blog"><Lang en="Blog" zh="博客" /></a>
   <article class="article">
-    <h1 class="article-title">{post.data.title}</h1>
-    <p class="article-meta">
-      <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+    <div class="lang-block" data-lang-panel="en">
+      <h1 class="article-title">{en.title}</h1>
+      <p class="article-meta">
+        <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+        {
+          category && (
+            <>
+              <span aria-hidden="true"> · </span>
+              <a href={`/blog/category/${category.id}`}>{category.label}</a>
+            </>
+          )
+        }
+      </p>
       {
-        category && (
-          <>
-            <span aria-hidden="true"> · </span>
-            <a href={`/blog/category/${category.id}`}>
-              <Lang en={category.label} zh={category.labelZh} />
-            </a>
-          </>
+        en.isTranslation && (
+          <p class="article-note">translated from chinese.</p>
         )
       }
-    </p>
-    <Content />
+      {
+        en.missing && (
+          <p class="article-note">english version not ready yet. showing the chinese text.</p>
+        )
+      }
+      <div class="prose" set:html={en.bodyHtml} />
+    </div>
+
+    <div class="lang-block" data-lang-panel="zh">
+      <h1 class="article-title">{zh.title}</h1>
+      <p class="article-meta">
+        <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+        {
+          category && (
+            <>
+              <span aria-hidden="true"> · </span>
+              <a href={`/blog/category/${category.id}`}>{category.labelZh}</a>
+            </>
+          )
+        }
+      </p>
+      {
+        zh.isTranslation && (
+          <p class="article-note">由英文译出。</p>
+        )
+      }
+      {
+        zh.missing && (
+          <p class="article-note">中文稿还没有。先看英文原文。</p>
+        )
+      }
+      <div class="prose" set:html={zh.bodyHtml} />
+    </div>
   </article>
 </Layout>
