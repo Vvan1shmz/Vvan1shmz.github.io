@@ -17,6 +17,7 @@ Category comes from the title (or an explicit `category` field):
 | `[reading]` / `阅读` | reading |
 | `[making]` / `制作` | making |
 | `[research]` / `研究` | research |
+| `[talk]` / `杂谈` | talk |
 | `[notes]` / `笔记` or none | notes |
 
 Example title: `[reading] finished the first chapter`

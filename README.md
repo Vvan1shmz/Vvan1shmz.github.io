@@ -8,7 +8,7 @@ Personal site: https://vvan1shmz.github.io
 npm run new-post -- "post title" notes
 ```
 
-Categories: `notes` | `reading` | `making` | `research`. Default is `notes`.
+Categories: `notes` | `reading` | `making` | `research` | `talk`. Default is `notes`.
 
 The file lands in `src/content/blog/` as a draft. `npm run dev` shows drafts locally. Production hides them.
 
@@ -27,7 +27,7 @@ A GitHub Action rebuilds `docs/` and GitHub Pages updates. You do not need to ru
 
 Write daily notes in the Obsidian vault folder `Diary/` (template: `Templates/Diary`).
 
-1. Put the category in the title: `[notes]`, `[reading]`, `[making]`, `[research]` (or 笔记 / 阅读 / 制作 / 研究).
+1. Put the category in the title: `[notes]`, `[reading]`, `[making]`, `[research]`, `[talk]` (or 笔记 / 阅读 / 制作 / 研究 / 杂谈).
 2. When the note should go live, set `publish: true` (or add `#blog`).
 3. Sync:
 

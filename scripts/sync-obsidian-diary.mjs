@@ -87,7 +87,7 @@ function isPublishable(data, body) {
 
 function stripCategoryMarks(title) {
   return title
-    .replace(/[\[【#]?\s*(notes|reading|making|research|笔记|阅读|制作|研究)\s*[\]】]?\s*[:：·-]?\s*/gi, "")
+    .replace(/[\[【#]?\s*(notes|reading|making|research|talk|笔记|阅读|制作|研究|杂谈)\s*[\]】]?\s*[:：·-]?\s*/gi, "")
     .replace(/\s+/g, " ")
     .trim();
 }
