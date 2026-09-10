@@ -12,7 +12,7 @@ or a `#blog` / `#publish` tag in the body.
 
 Category comes from the title (or an explicit `category` field):
 
-| In the title | Category |
+| In the title or `category` field | Category |
 | --- | --- |
 | `[reading]` / `阅读` | reading |
 | `[making]` / `制作` | making |
@@ -20,4 +20,5 @@ Category comes from the title (or an explicit `category` field):
 | `[talk]` / `杂谈` | talk |
 | `[notes]` / `笔记` or none | notes |
 
-Example title: `[reading] finished the first chapter`
+New notes should start from the Diary / Blog template so the properties panel shows `title`, `date`, `category`, `publish`, and `description`.
+
