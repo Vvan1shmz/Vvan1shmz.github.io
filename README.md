@@ -35,6 +35,8 @@ Write daily notes in the Obsidian vault folder `Diary/` (template: `Templates/Di
 npm run sync-diary
 ```
 
+Notes edited in the last 30 minutes are skipped (so a daily run will not grab a half-written diary). Use `--force` only when you mean it.
+
 Then commit and push the new files under `src/content/blog/` (and `inbox/.sync-state.json` if it changed). A daily Cursor Automation can run this check for you.
 
 The script also reads `inbox/diary/` in this repo, so notes that are already on GitHub can sync in the cloud.

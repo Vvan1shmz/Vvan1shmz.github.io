@@ -22,6 +22,17 @@ const allowed = new Set(config.categories);
 const args = new Set(process.argv.slice(2));
 const dryRun = args.has("--dry-run");
 const fromInboxOnly = args.has("--inbox-only");
+const force = args.has("--force");
+
+function minAgeMinutes() {
+  for (const arg of process.argv.slice(2)) {
+    const m = arg.match(/^--min-age-minutes=(\d+)$/);
+    if (m) return Number(m[1]);
+  }
+  return 30;
+}
+
+const ageMinutes = minAgeMinutes();
 
 function loadState() {
   try {
@@ -199,6 +210,15 @@ for (const source of sources) {
       continue;
     }
 
+    const mtimeMs = statSync(file).mtimeMs;
+    const ageMs = Date.now() - mtimeMs;
+    if (!force && ageMs < ageMinutes * 60 * 1000) {
+      skipped.push(
+        `${rel} (edited ${Math.round(ageMs / 60000)}m ago; wait ${ageMinutes}m or use --force)`,
+      );
+      continue;
+    }
+
     const { data, body } = parseFrontmatter(text);
     if (!isPublishable(data, body)) {
       skipped.push(`${rel} (not marked publish)`);
@@ -265,5 +285,5 @@ if (skipped.length && args.has("--verbose")) {
 console.log(
   created.length
     ? "Commit src/content/blog and inbox/.sync-state.json, then push."
-    : "Done.",
+    : `Done. Fresh edits are skipped for ${ageMinutes} minutes unless --force.`,
 );
