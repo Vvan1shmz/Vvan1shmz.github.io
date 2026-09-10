@@ -1,0 +1,12 @@
+{
+  "vaultPath": "/Users/junjiazhang/Documents/Obsidian Vault",
+  "diaryFolder": "Diary",
+  "inboxFolder": "inbox/diary",
+  "categories": ["notes", "reading", "making", "research"],
+  "titleCategoryRules": [
+    { "category": "reading", "match": "(^|\\[|【|#|·|\\s)(reading|阅读)(\\]|】|:|：|\\s|$)" },
+    { "category": "making", "match": "(^|\\[|【|#|·|\\s)(making|制作)(\\]|】|:|：|\\s|$)" },
+    { "category": "research", "match": "(^|\\[|【|#|·|\\s)(research|研究)(\\]|】|:|：|\\s|$)" },
+    { "category": "notes", "match": "(^|\\[|【|#|·|\\s)(notes|笔记)(\\]|】|:|：|\\s|$)" }
+  ]
+}
