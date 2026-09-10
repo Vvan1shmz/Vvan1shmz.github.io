@@ -2,13 +2,21 @@
 
 Put Obsidian daily notes here (or keep them in the vault `Diary/` folder; the sync script reads both).
 
-Only notes marked for publish are uploaded:
+Only notes marked for publish **and finished** are uploaded:
 
 ```yaml
 publish: true
 ```
 
 or a `#blog` / `#publish` tag in the body.
+
+Also add a line with only this character when the piece is done:
+
+```text
+完
+```
+
+Without that line, sync skips the note even if `publish` is on. The `完` line is removed before the post goes live.
 
 Category comes from the title (or an explicit `category` field):
 

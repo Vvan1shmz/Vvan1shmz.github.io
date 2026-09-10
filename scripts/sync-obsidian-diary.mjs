@@ -85,6 +85,20 @@ function isPublishable(data, body) {
   return /(?:^|\s)#blog(?:\s|$)/m.test(body) || /(?:^|\s)#publish(?:\s|$)/m.test(body);
 }
 
+/** Finished when the note has a standalone line that is only 完. */
+function isFinished(body) {
+  return /^完\s*$/m.test(body.replace(/\r/g, ""));
+}
+
+/** Drop the finish marker so it does not appear on the live post. */
+function stripFinishedMarker(body) {
+  return body
+    .replace(/\r/g, "")
+    .replace(/^\s*完\s*$/gm, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 function stripCategoryMarks(title) {
   return title
     .replace(/[\[【#]?\s*(notes|reading|making|research|talk|笔记|阅读|制作|研究|杂谈)\s*[\]】]?\s*[:：·-]?\s*/gi, "")
@@ -276,6 +290,10 @@ for (const source of sources) {
       skipped.push(`${rel} (not marked publish)`);
       continue;
     }
+    if (!isFinished(body)) {
+      skipped.push(`${rel} (not finished — add a line with only 完)`);
+      continue;
+    }
 
     const rawTitle =
       (typeof data.title === "string" && data.title) ||
@@ -291,7 +309,7 @@ for (const source of sources) {
       data.lang === "en" || data.lang === "zh"
         ? data.lang
         : detectSourceLang(`${title}\n${body}`);
-    const bodies = splitBilingualBody(body, lang);
+    const bodies = splitBilingualBody(stripFinishedMarker(body), lang);
     const description =
       (typeof data.description === "string" && data.description) ||
       firstParagraph(bodies[lang] || body) ||

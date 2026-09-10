@@ -29,7 +29,8 @@ Write daily notes in the Obsidian vault folder `Diary/` (template: `Templates/Di
 
 1. Put the category in the title: `[notes]`, `[reading]`, `[making]`, `[research]`, `[talk]` (or 笔记 / 阅读 / 制作 / 研究 / 杂谈).
 2. When the note should go live, set `publish: true` (or add `#blog`).
-3. Sync:
+3. When the piece is finished, put a line with only `完` at the end. Sync will not upload without it. That line is stripped before the post goes live.
+4. Sync:
 
 ```bash
 npm run sync-diary
