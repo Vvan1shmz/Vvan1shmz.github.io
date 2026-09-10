@@ -1,9 +1,9 @@
 ---
-title: "[notes] {{date}}"
-date: "{{date}}"
+title: "[notes] <% tp.date.now("YYYY-MM-DD") %>"
+date: <% tp.date.now("YYYY-MM-DD") %>
 category: notes
 publish: false
 description: ""
 ---
 
-# {{date}}
+# <% tp.date.now("YYYY-MM-DD") %>
