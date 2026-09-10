@@ -23,6 +23,22 @@ A GitHub Action rebuilds `docs/` and GitHub Pages updates. You do not need to ru
 
 `npm run publish-post` with no argument lists drafts.
 
+## Obsidian diary
+
+Write daily notes in the Obsidian vault folder `Diary/` (template: `Templates/Diary`).
+
+1. Put the category in the title: `[notes]`, `[reading]`, `[making]`, `[research]` (or 笔记 / 阅读 / 制作 / 研究).
+2. When the note should go live, set `publish: true` (or add `#blog`).
+3. Sync:
+
+```bash
+npm run sync-diary
+```
+
+Then commit and push the new files under `src/content/blog/` (and `inbox/.sync-state.json` if it changed). A daily Cursor Automation can run this check for you.
+
+The script also reads `inbox/diary/` in this repo, so notes that are already on GitHub can sync in the cloud.
+
 ## About
 
 English: `src/content/pages/about.md`  
