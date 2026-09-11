@@ -18,6 +18,15 @@ Also add a line with only this character when the piece is done:
 
 Without that line, sync skips the note even if `publish` is on. The `完` line is removed before the post goes live.
 
+Embedded images sync too. Use Obsidian embeds or markdown:
+
+```text
+![[photo.jpg]]
+![alt text](photo.jpg)
+```
+
+The script copies them into `public/images/posts/<slug>/` and rewrites the links for the live site. Keep attachments in the vault (same folder as the note, or `Attachments` / vault root).
+
 Category comes from the title (or an explicit `category` field):
 
 | In the title or `category` field | Category |

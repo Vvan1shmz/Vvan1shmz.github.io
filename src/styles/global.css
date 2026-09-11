@@ -871,6 +871,14 @@ html[data-theme="light"] .mail-pop-panel {
   margin: 0 0 1.15rem;
 }
 
+.article :where(img),
+.prose :where(img) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.1rem 0;
+}
+
 .article :where(ul, ol) {
   padding-left: 1.2rem;
 }

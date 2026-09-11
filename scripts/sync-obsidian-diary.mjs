@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import {
+  copyFileSync,
   existsSync,
   mkdirSync,
   readFileSync,
@@ -7,7 +8,7 @@ import {
   writeFileSync,
   statSync,
 } from "node:fs";
-import { basename, dirname, join, relative } from "node:path";
+import { basename, dirname, extname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -17,7 +18,17 @@ const config = JSON.parse(
 const statePath = join(root, "inbox", ".sync-state.json");
 const blogDir = join(root, "src/content/blog");
 const inboxDir = join(root, config.inboxFolder);
+const publicImagesDir = join(root, "public", "images", "posts");
 const allowed = new Set(config.categories);
+const IMAGE_EXT = new Set([
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".webp",
+  ".svg",
+  ".avif",
+]);
 
 const args = new Set(process.argv.slice(2));
 const dryRun = args.has("--dry-run");
@@ -97,6 +108,131 @@ function stripFinishedMarker(body) {
     .replace(/^\s*完\s*$/gm, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+function isImagePath(path) {
+  return IMAGE_EXT.has(extname(path).toLowerCase());
+}
+
+function safePublicName(name) {
+  const base = basename(name);
+  const cleaned = base
+    .normalize("NFKD")
+    .replace(/[^\w.\u4e00-\u9fff-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return cleaned || `image${extname(base).toLowerCase()}`;
+}
+
+/** Collect Obsidian wiki embeds and local markdown images. */
+function extractImageRefs(body) {
+  const refs = [];
+  const text = body.replace(/\r/g, "");
+  for (const m of text.matchAll(
+    /!\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]*))?\]\]/g,
+  )) {
+    const path = m[1].trim().replace(/\\/g, "/");
+    if (!isImagePath(path)) continue;
+    const opt = (m[2] ?? "").split("|")[0].trim();
+    const alt =
+      !opt || /^\d+(x\d+)?$/i.test(opt)
+        ? basename(path, extname(path))
+        : opt;
+    refs.push({ raw: m[0], path, alt });
+  }
+  for (const m of text.matchAll(
+    /!\[([^\]]*)\]\(([^)\s]+)(?:\s+(?:"[^"]*"|'[^']*'))?\)/g,
+  )) {
+    const path = m[2].trim().replace(/\\/g, "/");
+    if (/^(https?:|data:|mailto:|\/)/i.test(path)) continue;
+    if (!isImagePath(path)) continue;
+    refs.push({
+      raw: m[0],
+      path,
+      alt: m[1].trim() || basename(path, extname(path)),
+    });
+  }
+  return refs;
+}
+
+function walkFiles(dir, out = [], depth = 0) {
+  if (!existsSync(dir) || depth > 6) return out;
+  for (const name of readdirSync(dir)) {
+    if (name.startsWith(".")) continue;
+    const path = join(dir, name);
+    let st;
+    try {
+      st = statSync(path);
+    } catch {
+      continue;
+    }
+    if (st.isDirectory()) walkFiles(path, out, depth + 1);
+    else out.push(path);
+  }
+  return out;
+}
+
+function resolveAttachment(noteDir, relPath) {
+  const vaultPath = config.vaultPath;
+  const decoded = decodeURIComponent(relPath);
+  const candidates = [
+    join(noteDir, decoded),
+    join(vaultPath, decoded),
+    join(vaultPath, "Attachments", basename(decoded)),
+    join(vaultPath, "assets", basename(decoded)),
+    join(vaultPath, "Diary", basename(decoded)),
+  ];
+  for (const candidate of candidates) {
+    if (existsSync(candidate) && statSync(candidate).isFile()) return candidate;
+  }
+  const want = basename(decoded).toLowerCase();
+  for (const file of walkFiles(vaultPath)) {
+    if (basename(file).toLowerCase() === want && isImagePath(file)) return file;
+  }
+  return null;
+}
+
+function rewriteImages(body, noteDir, slug, copied) {
+  const refs = extractImageRefs(body);
+  if (!refs.length) return { body, assets: [] };
+
+  let next = body;
+  const assets = [];
+  const usedNames = new Set();
+
+  for (const ref of refs) {
+    const source = resolveAttachment(noteDir, ref.path);
+    if (!source) {
+      console.warn(`  missing image: ${ref.path} (in ${slug})`);
+      continue;
+    }
+    let name = safePublicName(basename(source));
+    let n = 2;
+    while (usedNames.has(name.toLowerCase())) {
+      const ext = extname(name);
+      const stem = name.slice(0, name.length - ext.length);
+      name = `${stem}-${n}${ext}`;
+      n += 1;
+    }
+    usedNames.add(name.toLowerCase());
+
+    const destDir = join(publicImagesDir, slug);
+    const dest = join(destDir, name);
+    const publicUrl = `/images/posts/${slug}/${name}`.split(sep).join("/");
+    const fileHash = hashText(readFileSync(source));
+    assets.push({ path: ref.path, publicUrl, fileHash });
+
+    if (!dryRun) {
+      mkdirSync(destDir, { recursive: true });
+      copyFileSync(source, dest);
+      copied.push(`${relative(root, dest)}`);
+    }
+
+    const md = `![${ref.alt.replace(/[\[\]]/g, "")}](${publicUrl})`;
+    next = next.split(ref.raw).join(md);
+  }
+
+  return { body: next, assets };
 }
 
 function stripCategoryMarks(title) {
@@ -261,6 +397,7 @@ if (!sources.length) {
 const seen = new Set();
 const created = [];
 const skipped = [];
+const copiedImages = [];
 
 for (const source of sources) {
   for (const file of walkMarkdown(source.dir)) {
@@ -269,13 +406,6 @@ for (const source of sources) {
     seen.add(file);
 
     const text = readFileSync(file, "utf8");
-    const digest = hashText(text);
-    const prev = state.files[rel];
-    if (prev?.hash === digest) {
-      skipped.push(`${rel} (unchanged)`);
-      continue;
-    }
-
     const mtimeMs = statSync(file).mtimeMs;
     const ageMs = Date.now() - mtimeMs;
     if (!force && ageMs < ageMinutes * 60 * 1000) {
@@ -295,6 +425,21 @@ for (const source of sources) {
       continue;
     }
 
+    const noteDir = dirname(file);
+    const imageRefs = extractImageRefs(body);
+    const assetHashes = [];
+    for (const ref of imageRefs) {
+      const abs = resolveAttachment(noteDir, ref.path);
+      if (abs) assetHashes.push(hashText(readFileSync(abs)));
+      else assetHashes.push(`missing:${ref.path}`);
+    }
+    const digest = hashText(`${text}\n${assetHashes.join("|")}`);
+    const prev = state.files[rel];
+    if (prev?.hash === digest) {
+      skipped.push(`${rel} (unchanged)`);
+      continue;
+    }
+
     const rawTitle =
       (typeof data.title === "string" && data.title) ||
       firstHeading(body) ||
@@ -309,21 +454,7 @@ for (const source of sources) {
       data.lang === "en" || data.lang === "zh"
         ? data.lang
         : detectSourceLang(`${title}\n${body}`);
-    const bodies = splitBilingualBody(stripFinishedMarker(body), lang);
-    const description =
-      (typeof data.description === "string" && data.description) ||
-      firstParagraph(bodies[lang] || body) ||
-      title;
-    const titleOther =
-      (typeof data.titleOther === "string" && data.titleOther) ||
-      (typeof data.title_zh === "string" && data.title_zh) ||
-      (typeof data.title_en === "string" && data.title_en) ||
-      "";
-    const descriptionOther =
-      (typeof data.descriptionOther === "string" && data.descriptionOther) ||
-      (typeof data.description_zh === "string" && data.description_zh) ||
-      (typeof data.description_en === "string" && data.description_en) ||
-      "";
+
     const slugBase = toSlug(
       (typeof data.slug === "string" && data.slug) || `${date}-${title}`,
     );
@@ -341,6 +472,29 @@ for (const source of sources) {
       n += 1;
     }
 
+    const cleaned = stripFinishedMarker(body);
+    const { body: withImages } = rewriteImages(
+      cleaned,
+      noteDir,
+      slug,
+      copiedImages,
+    );
+    const bodies = splitBilingualBody(withImages, lang);
+    const description =
+      (typeof data.description === "string" && data.description) ||
+      firstParagraph(bodies[lang] || withImages) ||
+      title;
+    const titleOther =
+      (typeof data.titleOther === "string" && data.titleOther) ||
+      (typeof data.title_zh === "string" && data.title_zh) ||
+      (typeof data.title_en === "string" && data.title_en) ||
+      "";
+    const descriptionOther =
+      (typeof data.descriptionOther === "string" && data.descriptionOther) ||
+      (typeof data.description_zh === "string" && data.description_zh) ||
+      (typeof data.description_en === "string" && data.description_en) ||
+      "";
+
     const post = buildPost({
       title,
       titleOther,
@@ -352,13 +506,23 @@ for (const source of sources) {
       bodies,
     });
     if (dryRun) {
-      created.push(`${rel} -> ${slug}.md (${category}, ${lang}) [dry-run]`);
+      created.push(
+        `${rel} -> ${slug}.md (${category}, ${lang}, ${imageRefs.length} images) [dry-run]`,
+      );
       continue;
     }
 
     writeFileSync(outPath, post);
-    state.files[rel] = { hash: digest, slug, category, syncedAt: new Date().toISOString() };
-    created.push(`${rel} -> src/content/blog/${slug}.md (${category}, ${lang})`);
+    state.files[rel] = {
+      hash: digest,
+      slug,
+      category,
+      images: imageRefs.length,
+      syncedAt: new Date().toISOString(),
+    };
+    created.push(
+      `${rel} -> src/content/blog/${slug}.md (${category}, ${lang}, ${imageRefs.length} images)`,
+    );
   }
 }
 
@@ -371,6 +535,11 @@ if (created.length) {
   console.log("Nothing new to publish.");
 }
 
+if (copiedImages.length) {
+  console.log("Images:");
+  for (const line of copiedImages) console.log(`  ${line}`);
+}
+
 if (skipped.length && args.has("--verbose")) {
   console.log("Skipped:");
   for (const line of skipped) console.log(`  ${line}`);
@@ -378,6 +547,6 @@ if (skipped.length && args.has("--verbose")) {
 
 console.log(
   created.length
-    ? "Commit src/content/blog and inbox/.sync-state.json, then push."
+    ? "Commit src/content/blog, public/images/posts, and inbox/.sync-state.json, then push."
     : `Done. Fresh edits are skipped for ${ageMinutes} minutes unless --force.`,
 );

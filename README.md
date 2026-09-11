@@ -30,7 +30,8 @@ Write daily notes in the Obsidian vault folder `Diary/` (template: `Templates/Di
 1. Put the category in the title: `[notes]`, `[reading]`, `[making]`, `[research]`, `[talk]` (or 笔记 / 阅读 / 制作 / 研究 / 杂谈).
 2. When the note should go live, set `publish: true` (or add `#blog`).
 3. When the piece is finished, put a line with only `完` at the end. Sync will not upload without it. That line is stripped before the post goes live.
-4. Sync:
+4. Images in the note (`![[photo.jpg]]` or `![](photo.jpg)`) are copied into `public/images/posts/<slug>/` and rewritten to site paths.
+5. Sync:
 
 ```bash
 npm run sync-diary
@@ -38,7 +39,7 @@ npm run sync-diary
 
 Notes edited in the last 30 minutes are skipped (so a daily run will not grab a half-written diary). Use `--force` only when you mean it.
 
-Then commit and push the new files under `src/content/blog/` (and `inbox/.sync-state.json` if it changed). A daily Cursor Automation can run this check for you.
+Then commit and push `src/content/blog/`, any new files under `public/images/posts/`, and `inbox/.sync-state.json` if it changed. A daily Cursor Automation can run this check for you.
 
 The script also reads `inbox/diary/` in this repo, so notes that are already on GitHub can sync in the cloud.
 
