@@ -1,0 +1,64 @@
+---
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { site } from "../data/site";
+import Lang from "./Lang.astro";
+
+type Credit = { credit?: string; page?: string; title?: string };
+
+let credits: Credit[] = [];
+try {
+  const creditsPath = fileURLToPath(new URL("../../public/images/world/credits.json", import.meta.url));
+  credits = JSON.parse(readFileSync(creditsPath, "utf8"));
+} catch {
+  credits = [];
+}
+---
+
+<div class="footer-hold">
+  <footer class="site-footer">
+    <div class="footer-cols">
+      <nav aria-label="footer">
+        <a href="/"><Lang en="About" zh="关于" /></a>
+        <a href="/blog"><Lang en="Blog" zh="博客" /></a>
+      </nav>
+      <div>
+        {
+          site.emails.map((address) => (
+            <a href={`mailto:${address}`}>{address}</a>
+          ))
+        }
+      </div>
+      <div>
+        {
+          site.social.github && (
+            <a href={site.social.github} rel="noopener noreferrer">
+              GitHub
+            </a>
+          )
+        }
+      </div>
+      <p>
+        <Lang en="my life goal is to achieve communism." zh="我的人生目标是实现共产主义。" />
+      </p>
+    </div>
+    <p class="wordmark">{site.name}</p>
+    {
+      credits.length > 0 && (
+        <ul class="credits">
+          {credits.map((item) => (
+            <li>
+              {item.page ? (
+                <a href={item.page} rel="noopener noreferrer">
+                  {item.credit || item.title}
+                </a>
+              ) : (
+                item.credit || item.title
+              )}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </footer>
+</div>

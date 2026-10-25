@@ -1,4 +1,5 @@
 node_modules/
+.taste-skill/
 dist/
 .astro/
 .DS_Store

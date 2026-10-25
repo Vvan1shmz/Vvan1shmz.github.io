@@ -7,6 +7,7 @@ interface Props {
 import { site } from "../data/site";
 import Header from "../components/Header.astro";
 import Constellation from "../components/Constellation.astro";
+import SiteFooter from "../components/SiteFooter.astro";
 import "../styles/global.css";
 
 const { title = site.title, description = site.description } = Astro.props;
@@ -17,7 +18,7 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
 <html lang="en" data-theme="dark" data-lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="theme-color" content="#070708" />
+    <meta name="theme-color" content="#18191b" />
     <script is:inline>
       (function () {
         try {
@@ -30,7 +31,8 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
           html.setAttribute("data-lang", lang);
           html.lang = lang === "zh" ? "zh-Hans" : "en";
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute("content", theme === "light" ? "#f4efe6" : "#070708");
+          if (meta) meta.setAttribute("content", theme === "light" ? "#eff0f1" : "#18191b");
+          document.documentElement.classList.add("js");
         } catch (e) {}
       })();
     </script>
@@ -39,10 +41,10 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.fontshare.com" />
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&display=swap"
+      href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500&display=swap"
       rel="stylesheet"
     />
     <meta property="og:title" content={title} />
@@ -56,13 +58,29 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
       <span data-lang-panel="en">Skip to content</span>
       <span data-lang-panel="zh">跳到正文</span>
     </a>
-    <div class="atmosphere" aria-hidden="true"></div>
     <Constellation />
-    <div class="pointer-light" id="pointer-light" aria-hidden="true"></div>
-    <div class="grain" aria-hidden="true"></div>
     <Header />
     <main id="content" class="page">
       <slot />
     </main>
+    <SiteFooter />
+    <script is:inline>
+      (function () {
+        var nodes = document.querySelectorAll("[data-reveal]");
+        if (!nodes.length) return;
+        if (!("IntersectionObserver" in window)) {
+          nodes.forEach(function (node) { node.classList.add("is-in"); });
+          return;
+        }
+        var seen = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-in");
+            seen.unobserve(entry.target);
+          });
+        }, { threshold: 0.18 });
+        nodes.forEach(function (node) { seen.observe(node); });
+      })();
+    </script>
   </body>
 </html>

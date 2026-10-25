@@ -46,7 +46,7 @@
             vx: 0,
             vy: 0,
             r: 0.65 + Math.random() * 1.25,
-            hue: [0, 38, 195, 250][i % 4],
+            hue: 24,
           });
         }
       }
@@ -73,7 +73,7 @@
             if (dist < 150) {
               const heat = Math.max(nearCursor(points[i].x, points[i].y), nearCursor(points[j].x, points[j].y));
               const alpha = (0.07 + heat * 0.16) * (1 - dist / 150);
-              ctx.strokeStyle = `hsla(${points[i].hue}, ${light ? 28 : 42}%, ${light ? 28 : 70}%, ${alpha})`;
+              ctx.strokeStyle = `hsla(24, ${light ? 8 : 16}%, ${light ? 24 : 74}%, ${alpha})`;
               ctx.beginPath();
               ctx.moveTo(points[i].x, points[i].y);
               ctx.lineTo(points[j].x, points[j].y);
@@ -84,7 +84,7 @@
         for (const p of points) {
           const pulse = reduceMotion ? 1 : 0.75 + Math.sin(t / 1100 + p.x) * 0.25;
           const heat = nearCursor(p.x, p.y);
-          ctx.fillStyle = `hsla(${p.hue}, ${light ? 22 : 28}%, ${light ? 24 : 84}%, ${(0.22 + heat * 0.45) * pulse})`;
+          ctx.fillStyle = `hsla(24, ${light ? 10 : 18}%, ${light ? 22 : 82}%, ${(0.14 + heat * 0.28) * pulse})`;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r + heat * 0.8, 0, Math.PI * 2);
           ctx.fill();

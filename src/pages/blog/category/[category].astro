@@ -41,7 +41,7 @@ const used = usedCategories(posts);
   description={`Posts in ${category.label}.`}
 >
   <a class="back" href="/blog"><Lang en="Blog" zh="博客" /></a>
-  <h1 class="page-kicker"><Lang en={category.label} zh={category.labelZh} /></h1>
+  <h1 class="page-title"><Lang en={category.label} zh={category.labelZh} /></h1>
   <CategoryNav current={categoryId} used={used} />
   {
     filtered.length ? (

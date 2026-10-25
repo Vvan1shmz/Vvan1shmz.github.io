@@ -7,20 +7,7 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 
 <header class="header">
   <div class="header-inner">
-    <a class="brand" href="/">
-      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-        <defs>
-          <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#c84b4b"></stop>
-            <stop offset="45%" stop-color="#e4c36a"></stop>
-            <stop offset="100%" stop-color="#6b7fd7"></stop>
-          </linearGradient>
-        </defs>
-        <circle cx="16" cy="16" r="11" fill="none" stroke="url(#prism)" stroke-width="1.6"></circle>
-        <circle cx="16" cy="16" r="2.2" fill="currentColor"></circle>
-      </svg>
-      {site.name}
-    </a>
+    <a class="brand" href="/">{site.name}</a>
     <nav class="nav" aria-label="primary">
       <a href="/" aria-current={path === "/" ? "page" : undefined}>
         <Lang en="About" zh="关于" />
@@ -41,11 +28,7 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
       }
       {
         site.social.github && (
-          <a href={site.social.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.2-3.4-1.2-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5a3.9 3.9 0 0 1 1-2.7 3.6 3.6 0 0 1 .1-2.6s.8-.3 2.7 1a9.3 9.3 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .4.8.4 1.8.1 2.6a3.9 3.9 0 0 1 1 2.7c0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.8v2.6c0 .3.2.6.7.5A10 10 0 0 0 12 2Z"></path>
-            </svg>
-          </a>
+          <a href={site.social.github} rel="noopener noreferrer">GitHub</a>
         )
       }
       {
@@ -100,8 +83,8 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 
   const THEME_KEY = "vvan1shmz-theme";
   const LANG_KEY = "vvan1shmz-lang";
-  const LIGHT_COLOR = "#f4efe6";
-  const DARK_COLOR = "#070708";
+  const LIGHT_COLOR = "#eff0f1";
+  const DARK_COLOR = "#18191b";
 
   function currentTheme() {
     return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
