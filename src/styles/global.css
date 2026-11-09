@@ -535,25 +535,6 @@ h2 {
   white-space: nowrap;
 }
 
-.credits {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  color: var(--muted);
-  font-size: var(--step-body);
-}
-
-.credits li {
-  max-width: 58ch;
-}
-
-.credits a {
-  color: inherit;
-}
-
 .page-title,
 .article-title {
   margin: 0 0 1.5rem;

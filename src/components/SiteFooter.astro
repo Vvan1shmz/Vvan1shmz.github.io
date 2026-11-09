@@ -1,18 +1,6 @@
 ---
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { site } from "../data/site";
 import Lang from "./Lang.astro";
-
-type Credit = { credit?: string; page?: string; title?: string };
-
-let credits: Credit[] = [];
-try {
-  const creditsPath = fileURLToPath(new URL("../../public/images/world/credits.json", import.meta.url));
-  credits = JSON.parse(readFileSync(creditsPath, "utf8"));
-} catch {
-  credits = [];
-}
 ---
 
 <div class="footer-hold">
@@ -43,22 +31,5 @@ try {
       </p>
     </div>
     <p class="wordmark">{site.name}</p>
-    {
-      credits.length > 0 && (
-        <ul class="credits">
-          {credits.map((item) => (
-            <li>
-              {item.page ? (
-                <a href={item.page} rel="noopener noreferrer">
-                  {item.credit || item.title}
-                </a>
-              ) : (
-                item.credit || item.title
-              )}
-            </li>
-          ))}
-        </ul>
-      )
-    }
   </footer>
 </div>
