@@ -93,51 +93,12 @@ const likes = enLikes.map((label, index) => {
   };
 });
 
-const ringSources = likes.filter((item) => item.picture);
-const ringCount = 16;
-const ring = Array.from({ length: ringCount }, (_, index) => {
-  const like = ringSources[index % Math.max(ringSources.length, 1)];
-  const turn = (index / ringCount) * Math.PI * 2 - Math.PI / 2;
-  const x = 50 + Math.cos(turn) * 36;
-  const y = 48 + Math.sin(turn) * 33;
-  const rot = Math.cos(turn) * 14;
-  const w = 128 + ((Math.sin(turn) + 1) / 2) * 86;
-  const seen = ringSources.findIndex((item) => item.id === like?.id);
-  const primary = index % Math.max(ringSources.length, 1) === seen;
-  return { like, x, y, rot, w, primary, index };
-}).filter((frame) => frame.like?.picture);
-
-const stage = [...new Map(ringSources.map((item) => [item.picture!.key, item])).values()];
-const goalShots = [pictures.sky, pictures.ski].filter(Boolean);
+const pictured = likes.filter((item) => item.picture);
+const stage = [...new Map(pictured.map((item) => [item.picture!.key, item])).values()];
 ---
 
 <div class="home">
   <section class="hero" aria-labelledby="home-title">
-    <div class="ring">
-      {
-        ring.map((frame) => (
-          <a
-            class:list={["ring-frame", { "is-spare": frame.index % 2 === 1 }]}
-            href={`#${frame.like.id}`}
-            data-like={frame.like.id}
-            data-shot={frame.like.picture!.key}
-            data-en={frame.like.label}
-            data-zh={frame.like.zh}
-            aria-hidden={frame.primary ? undefined : "true"}
-            tabindex={frame.primary ? undefined : -1}
-            style={`--x:${frame.x.toFixed(2)}%;--y:${frame.y.toFixed(2)}%;--rot:${frame.rot.toFixed(1)}deg;--w:${frame.w.toFixed(0)}px`}
-          >
-            <img
-              src={frame.like.picture!.src}
-              alt={frame.primary ? frame.like.picture!.en : ""}
-              width="640"
-              height="800"
-              class:list={{ "is-light": frame.like.picture!.light }}
-            />
-          </a>
-        ))
-      }
-    </div>
     <div class="hero-core">
       <h1 class="lines" id="home-title">
         <span class="line"><span data-line style="--i:0"><Lang en="I'm" zh="我是" /></span></span>
@@ -155,15 +116,6 @@ const goalShots = [pictures.sky, pictures.ski].filter(Boolean);
       <span class="line"><span data-line style="--i:0"><Lang en="my life goal is" zh="我的人生目标是" /></span></span>
       <span class="line"><span data-line style="--i:1"><Lang en="to achieve communism." zh="实现共产主义。" /></span></span>
     </h2>
-    <div class="goal-shots">
-      {
-        goalShots.map((shot) => (
-          <figure>
-            <img class:list={{ "is-light": shot.light }} src={shot.src} alt={shot.en} width="960" height="640" />
-          </figure>
-        ))
-      }
-    </div>
   </section>
 
   <section class="split" data-reveal>
@@ -246,19 +198,9 @@ const goalShots = [pictures.sky, pictures.ski].filter(Boolean);
 <script>
   const root = document.querySelector(".home");
   if (root) {
-    const note = root.querySelector(".hero-note");
     const caption = root.querySelector(".like-caption");
-    const frames = [...root.querySelectorAll(".ring-frame")];
     const rows = [...root.querySelectorAll(".like")];
     const shots = [...root.querySelectorAll(".like-stage img")];
-
-    const lang = () => (document.documentElement.dataset.lang === "zh" ? "zh" : "en");
-
-    const writeNote = (frame?: Element | null) => {
-      if (!(note instanceof HTMLElement)) return;
-      const next = frame instanceof HTMLElement ? frame.dataset[lang()] : note.dataset[lang()];
-      if (next) note.textContent = next;
-    };
 
     const activate = (id: string | undefined, shot: string | undefined) => {
       if (!id) return;
@@ -284,14 +226,6 @@ const goalShots = [pictures.sky, pictures.ski].filter(Boolean);
       activate(node.dataset.like, node.dataset.shot);
     };
 
-    for (const frame of frames) {
-      frame.addEventListener("pointerenter", () => writeNote(frame));
-      frame.addEventListener("focus", () => writeNote(frame));
-      frame.addEventListener("pointerleave", () => writeNote(null));
-      frame.addEventListener("blur", () => writeNote(null));
-      frame.addEventListener("click", () => from(frame));
-    }
-
     for (const row of rows) {
       row.addEventListener("pointerenter", () => from(row));
       row.addEventListener("focus", () => from(row));
@@ -311,10 +245,5 @@ const goalShots = [pictures.sky, pictures.ski].filter(Boolean);
       );
       for (const item of root.querySelectorAll(".like-list li")) watch.observe(item);
     }
-
-    new MutationObserver(() => writeNote(root.querySelector(".ring-frame:focus"))).observe(
-      document.documentElement,
-      { attributes: true, attributeFilter: ["data-lang"] },
-    );
   }
 </script>

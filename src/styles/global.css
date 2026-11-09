@@ -246,33 +246,9 @@ html[data-theme="light"] .pref-moon {
 }
 
 .hero {
-  position: relative;
-  min-height: 100svh;
-  overflow: clip;
-  display: grid;
-  place-items: center;
+  padding: calc(var(--header) + 3.5rem) var(--pad) 0;
 }
 
-.ring {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: var(--header);
-  bottom: 0;
-}
-
-.ring-frame {
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: var(--w);
-  aspect-ratio: 4 / 5;
-  transform: translate(-50%, -50%) rotate(var(--rot));
-  overflow: clip;
-}
-
-.ring-frame img,
-.goal-shots img,
 .like-stage img,
 .article img,
 .prose img {
@@ -281,26 +257,15 @@ html[data-theme="light"] .pref-moon {
   object-fit: cover;
 }
 
-.ring-frame img.is-light,
-.goal-shots img.is-light,
 .like-stage img.is-light {
   filter: brightness(0.84) contrast(1.05);
 }
 
 .hero-core {
-  position: relative;
-  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: min(34rem, calc(100% - 3rem));
-  padding: 1.25rem 1.25rem 1.5rem;
-  background: var(--bg);
-  pointer-events: none;
-}
-
-.hero-core :is(a, button) {
-  pointer-events: auto;
+  width: min(40rem, 100%);
 }
 
 .lines .line {
@@ -384,21 +349,6 @@ h2 {
 
 .goal-title .line {
   white-space: nowrap;
-}
-
-.goal-shots {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.goal-shots figure {
-  margin: 0;
-}
-
-.goal-shots img {
-  aspect-ratio: 3 / 2;
 }
 
 .beliefs,
@@ -801,18 +751,12 @@ h2 {
     animation-delay: 160ms;
   }
 
-  .like-stage img,
-  .ring-frame img {
+  .like-stage img {
     transition: opacity 300ms var(--ease), transform 300ms var(--ease);
   }
 
   .like-stage img.on {
     animation: drift 18s var(--ease) infinite alternate;
-  }
-
-  .ring-frame:hover img,
-  .ring-frame:focus-visible img {
-    transform: scale(1.04);
   }
 
   .nav a,
@@ -856,14 +800,6 @@ h2 {
 
   .home {
     gap: 4.5rem;
-  }
-
-  .ring-frame.is-spare {
-    display: none;
-  }
-
-  .hero-core {
-    width: min(100% - 2rem, 22rem);
   }
 
   h1 {
