@@ -1,6 +1,4 @@
 ---
-import { existsSync } from "node:fs";
-import { join } from "node:path";
 import type { CollectionEntry } from "astro:content";
 import ContactLine from "./ContactLine.astro";
 import Lang from "./Lang.astro";
@@ -14,64 +12,6 @@ const { about, aboutZh } = Astro.props;
 const en = about.data;
 const zh = aboutZh.data;
 
-const catalog = [
-  {
-    key: "desk",
-    file: "desk-jpg.jpg",
-    light: true,
-    en: "A writing desk in a state study.",
-    zh: "一间书房里的写字桌。",
-  },
-  {
-    key: "drone",
-    file: "drone-jpg.jpg",
-    light: true,
-    en: "A quadcopter in the air.",
-    zh: "空中的一架无人机。",
-  },
-  {
-    key: "gym",
-    file: "gym-jpg.jpg",
-    light: true,
-    en: "Calisthenics bars in a park.",
-    zh: "公园里的徒手健身架。",
-  },
-  {
-    key: "ski",
-    file: "ski-jpg.jpg",
-    light: true,
-    en: "A downhill ski slope.",
-    zh: "一条滑雪道。",
-  },
-  {
-    key: "guitar",
-    file: "guitar-jpg.jpg",
-    light: true,
-    en: "A twelve-string electric guitar.",
-    zh: "一把十二弦电吉他。",
-  },
-  {
-    key: "vinyl",
-    file: "vinyl-jpg.jpg",
-    light: false,
-    en: "A vinyl record.",
-    zh: "一张黑胶唱片。",
-  },
-  {
-    key: "sky",
-    file: "sky-jpg.jpg",
-    light: false,
-    en: "Night sky above bare trees.",
-    zh: "枯树上方的夜空。",
-  },
-] as const;
-
-const pictures = Object.fromEntries(
-  catalog
-    .filter((item) => existsSync(join(process.cwd(), "public/images/world", item.file)))
-    .map((item) => [item.key, { ...item, src: `/images/world/${item.file}` }]),
-);
-
 function splitList(value: string) {
   return value
     .split(/[,、]/)
@@ -79,22 +19,12 @@ function splitList(value: string) {
     .filter(Boolean);
 }
 
-const likeKeys = ["desk", "drone", "gym", "", "ski", "guitar", "vinyl", "vinyl", ""] as const;
 const enLikes = splitList(en.likes);
 const zhLikes = splitList(zh.likes);
-const likes = enLikes.map((label, index) => {
-  const key = likeKeys[index] ?? "";
-  const picture = key ? pictures[key] : undefined;
-  return {
-    id: `like-${index}`,
-    label,
-    zh: zhLikes[index] ?? label,
-    picture,
-  };
-});
-
-const pictured = likes.filter((item) => item.picture);
-const stage = [...new Map(pictured.map((item) => [item.picture!.key, item])).values()];
+const likes = enLikes.map((label, index) => ({
+  label,
+  zh: zhLikes[index] ?? label,
+}));
 ---
 
 <div class="home">
@@ -131,49 +61,17 @@ const stage = [...new Map(pictured.map((item) => [item.picture!.key, item])).val
     </ul>
   </section>
 
-  {
-    stage.length > 0 && (
-      <section class="likes" data-reveal aria-labelledby="likes-title">
-        <div class="like-stage" aria-live="polite">
-          {stage.map((item, index) => (
-            <img
-              class:list={{ on: index === 0, "is-light": item.picture!.light }}
-              data-for={item.picture!.key}
-              src={item.picture!.src}
-              alt={item.picture!.en}
-              width="900"
-              height="1120"
-            />
-          ))}
-          <p class="like-caption">
-            <span data-lang-panel="en">{stage[0].picture!.en}</span>
-            <span data-lang-panel="zh">{stage[0].picture!.zh}</span>
-          </p>
-        </div>
-        <div class="like-copy">
-          <h2 id="likes-title"><Lang en="here are some things i like" zh="这些是我喜欢的" /></h2>
-          <ul class="like-list">
-            {likes.map((item) => (
-              <li id={item.id}>
-                <button
-                  type="button"
-                  class:list={["like", { "is-on": stage[0]?.id === item.id }]}
-                  data-like={item.id}
-                  data-shot={item.picture?.key ?? ""}
-                  data-en={item.picture?.en ?? ""}
-                  data-zh={item.picture?.zh ?? ""}
-                  aria-pressed={stage[0]?.id === item.id ? "true" : "false"}
-                >
-                  <span class="like-name"><Lang en={item.label} zh={item.zh} /></span>
-                  <span class="like-other"><Lang en={item.zh} zh={item.label} /></span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-    )
-  }
+  <section class="likes" data-reveal aria-labelledby="likes-title">
+    <h2 id="likes-title"><Lang en="here are some things i like" zh="这些是我喜欢的" /></h2>
+    <ul class="like-list">
+      {likes.map((item) => (
+        <li class="like">
+          <span class="like-name"><Lang en={item.label} zh={item.zh} /></span>
+          <span class="like-other"><Lang en={item.zh} zh={item.label} /></span>
+        </li>
+      ))}
+    </ul>
+  </section>
 
   <section class="split" data-reveal>
     <h2><Lang en="things i don't like" zh="这些我不喜欢" /></h2>
@@ -194,56 +92,3 @@ const stage = [...new Map(pictured.map((item) => [item.picture!.key, item])).val
     <a class="email-display" href="mailto:vvan1shmz@gmail.com">vvan1shmz@gmail.com</a>
   </section>
 </div>
-
-<script>
-  const root = document.querySelector(".home");
-  if (root) {
-    const caption = root.querySelector(".like-caption");
-    const rows = [...root.querySelectorAll(".like")];
-    const shots = [...root.querySelectorAll(".like-stage img")];
-
-    const activate = (id: string | undefined, shot: string | undefined) => {
-      if (!id) return;
-      for (const row of rows) {
-        const on = row instanceof HTMLElement && row.dataset.like === id;
-        row.classList.toggle("is-on", on);
-        if (row instanceof HTMLButtonElement) row.setAttribute("aria-pressed", on ? "true" : "false");
-      }
-      if (!shot) return;
-      for (const image of shots) {
-        if (image instanceof HTMLElement) image.classList.toggle("on", image.dataset.for === shot);
-      }
-      const row = rows.find((item) => item instanceof HTMLElement && item.dataset.like === id);
-      if (!(caption instanceof HTMLElement) || !(row instanceof HTMLElement)) return;
-      const en = caption.querySelector('[data-lang-panel="en"]');
-      const zh = caption.querySelector('[data-lang-panel="zh"]');
-      if (en && row.dataset.en) en.textContent = row.dataset.en;
-      if (zh && row.dataset.zh) zh.textContent = row.dataset.zh;
-    };
-
-    const from = (node: EventTarget | null) => {
-      if (!(node instanceof HTMLElement)) return;
-      activate(node.dataset.like, node.dataset.shot);
-    };
-
-    for (const row of rows) {
-      row.addEventListener("pointerenter", () => from(row));
-      row.addEventListener("focus", () => from(row));
-      row.addEventListener("click", () => from(row));
-    }
-
-    if ("IntersectionObserver" in window) {
-      const watch = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (!entry.isIntersecting) continue;
-            const button = entry.target.querySelector(".like");
-            if (button instanceof HTMLElement) activate(button.dataset.like, button.dataset.shot);
-          }
-        },
-        { rootMargin: "-42% 0px -42% 0px", threshold: 0.2 },
-      );
-      for (const item of root.querySelectorAll(".like-list li")) watch.observe(item);
-    }
-  }
-</script>
