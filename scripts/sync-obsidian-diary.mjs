@@ -110,6 +110,17 @@ function stripFinishedMarker(body) {
     .trim();
 }
 
+/** The page already shows the title, so drop a matching opening heading. */
+function stripDuplicateTitle(body, title) {
+  const lines = body.replace(/\r/g, "").split("\n");
+  let index = 0;
+  while (index < lines.length && lines[index].trim() === "") index += 1;
+  const heading = lines[index]?.match(/^#\s+(.+)$/);
+  if (!heading || heading[1].trim() !== title.trim()) return body.trim();
+  lines.splice(index, 1);
+  return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
 function isImagePath(path) {
   return IMAGE_EXT.has(extname(path).toLowerCase());
 }
@@ -472,7 +483,7 @@ for (const source of sources) {
       n += 1;
     }
 
-    const cleaned = stripFinishedMarker(body);
+    const cleaned = stripDuplicateTitle(stripFinishedMarker(body), title);
     const { body: withImages } = rewriteImages(
       cleaned,
       noteDir,
